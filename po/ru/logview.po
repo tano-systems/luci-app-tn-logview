@@ -1,0 +1,87 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Anton Kikin <a.kikin@tano-systems.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ru\n"
+"X-Generator: Poedit 2.2\n"
+
+#: htdocs/luci-static/resources/view/status/logview.js:92
+msgid "Display descending time (latest on top)"
+msgstr "Отображать по убыванию времени (последнее сверху)"
+
+#: htdocs/luci-static/resources/view/status/logview.js:65
+msgid "Download (CSV)"
+msgstr "Скачать (CSV)"
+
+#: htdocs/luci-static/resources/view/status/logview.js:60
+msgid "Download (TXT)"
+msgstr "Скачать (TXT)"
+
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:34
+msgid "Facility"
+msgstr "Категория"
+
+#: htdocs/luci-static/resources/logview/logview.js:180
+msgid "Failed to parse log data"
+msgstr "Не удалось прочитать данные журнала"
+
+#: htdocs/luci-static/resources/logview/plugins/kernel.js:4
+msgid "Kernel Log"
+msgstr "Журнал ядра"
+
+#: htdocs/luci-static/resources/logview/logview.js:217
+#: htdocs/luci-static/resources/view/status/logview.js:70
+msgid "Loading data…"
+msgstr "Загрузка данных..."
+
+#: htdocs/luci-static/resources/view/status/logview.js:97
+msgid "Log Entries"
+msgstr "Записи журнала"
+
+#: htdocs/luci-static/resources/view/status/logview.js:110
+msgid "Log View"
+msgstr "Просмотр журналов"
+
+#: htdocs/luci-static/resources/logview/logview.js:198
+msgid "Log is empty"
+msgstr "Журнал не содержит записей"
+
+#: root/usr/share/luci/menu.d/luci-app-tn-logview.json:3
+msgid "Logs"
+msgstr "Журналы"
+
+#: htdocs/luci-static/resources/logview/plugins/kernel.js:33
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:35
+msgid "Message"
+msgstr "Сообщение"
+
+#: htdocs/luci-static/resources/logview/plugins/kernel.js:32
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:33
+msgid "Priority"
+msgstr "Приоритет"
+
+#: htdocs/luci-static/resources/view/status/logview.js:55
+msgid "Refresh"
+msgstr "Обновить"
+
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:4
+msgid "System Log"
+msgstr "Системный журнал"
+
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:32
+msgid "Tag"
+msgstr "Тег"
+
+#: htdocs/luci-static/resources/logview/plugins/kernel.js:31
+msgid "Time"
+msgstr "Время"
+
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:31
+msgid "Timestamp"
+msgstr "Временная метка"

@@ -1,0 +1,77 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: htdocs/luci-static/resources/view/status/logview.js:92
+msgid "Display descending time (latest on top)"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/status/logview.js:65
+msgid "Download (CSV)"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/status/logview.js:60
+msgid "Download (TXT)"
+msgstr ""
+
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:34
+msgid "Facility"
+msgstr ""
+
+#: htdocs/luci-static/resources/logview/logview.js:180
+msgid "Failed to parse log data"
+msgstr ""
+
+#: htdocs/luci-static/resources/logview/plugins/kernel.js:4
+msgid "Kernel Log"
+msgstr ""
+
+#: htdocs/luci-static/resources/logview/logview.js:217
+#: htdocs/luci-static/resources/view/status/logview.js:70
+msgid "Loading data…"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/status/logview.js:97
+msgid "Log Entries"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/status/logview.js:110
+msgid "Log View"
+msgstr ""
+
+#: htdocs/luci-static/resources/logview/logview.js:198
+msgid "Log is empty"
+msgstr ""
+
+#: root/usr/share/luci/menu.d/luci-app-tn-logview.json:3
+msgid "Logs"
+msgstr ""
+
+#: htdocs/luci-static/resources/logview/plugins/kernel.js:33
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:35
+msgid "Message"
+msgstr ""
+
+#: htdocs/luci-static/resources/logview/plugins/kernel.js:32
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:33
+msgid "Priority"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/status/logview.js:55
+msgid "Refresh"
+msgstr ""
+
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:4
+msgid "System Log"
+msgstr ""
+
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:32
+msgid "Tag"
+msgstr ""
+
+#: htdocs/luci-static/resources/logview/plugins/kernel.js:31
+msgid "Time"
+msgstr ""
+
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:31
+msgid "Timestamp"
+msgstr ""

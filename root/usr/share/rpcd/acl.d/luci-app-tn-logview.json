@@ -1,0 +1,12 @@
+{
+	"luci-app-tn-logview": {
+		"description": "Grant access to log viewer LuCI application",
+		"read": {
+			"cgi-io": [ "exec" ],
+			"file": {
+				"/usr/libexec/luci-logview/logview-dmesg *": [ "exec" ],
+				"/usr/libexec/luci-logview/logview-syslog *": [ "exec" ]
+			}
+		}
+	}
+}

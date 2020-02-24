@@ -1,0 +1,88 @@
+.logview-table .td,
+.logview-table .th {
+	min-width: 0;
+}
+
+.logview-table .td {
+	padding: 1px 8px;
+	background-color: #f8f8f8;
+	font-family: monospace;
+	border: 0 !important;
+	font-size: 80%;
+}
+
+.logview-table .td.lf-ktime {
+	text-align: right;
+}
+
+.logview-table .td.lf-tag {
+	white-space: nowrap;
+}
+
+.logview-table .td.lf-message {
+	      min-width: 250px;
+	    font-family: monospace;
+	  overflow-wrap: break-word;
+	      word-wrap: break-word;
+	 -ms-word-break: break-all;
+	     word-break: break-all;
+	     word-break: break-word;
+	    -ms-hyphens: auto;
+	   -moz-hyphens: auto;
+	-webkit-hyphens: auto;
+	        hyphens: auto;
+}
+
+/* alert, crit, panic, emerg */
+.lv-p-alert .td, .lv-p-alert.td,
+.lv-p-crit .td, .lv-p-crit.td,
+.lv-p-panic .td, .lv-p-panic.td,
+.lv-p-emerg .td, .lv-p-emerg.td {
+	color: #f9e4e4; /* WHITE on RED */
+	font-weight: bold;
+	background-color: rgb(230, 0, 0);
+}
+
+/* err, error */
+.lv-p-err .td, .lv-p-err.td,
+.lv-p-error .td, .lv-p-error.td {
+	color: #651010; /* RED on RED */
+	background-color: rgba(255, 179, 179, 0.4);
+}
+
+/* warn, warning */
+.lv-p-warn .td, .lv-p-warn.td,
+.lv-p-warning .td, .lv-p-warning.td {
+	color: #654f10; /* YELLOW */
+	background-color: rgba(255, 213, 153, 0.4);
+}
+
+/* notice */
+.lv-p-notice .td, .lv-p-notice.td {
+	color: #104565; /* BLUE */
+	background-color: rgba(179, 224, 255, 0.4);
+}
+
+/* info, none (default) */
+
+/* debug */
+.lv-p-debug .td, .lv-p-debug.td {
+	color: #b3b3b3; /* GRAY */
+	background-color: #ededed;
+}
+
+.logview-controls {
+	display: flex;
+	flex-flow: row;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+.logview-controls > div {
+	align-items: center;
+	display: flex;
+	flex-flow: row;
+}
+
+.logview-controls > div button + button { margin-left: 5px; }
+.logview-controls > div label { margin-left: 4px; margin-right: 8px; }
