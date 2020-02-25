@@ -12,12 +12,13 @@
 	line-height: 16px;
 }
 
-.logview-table .td.lf-ktime {
-	text-align: right;
-}
-
+.logview-table .td.lf-timestamp,
 .logview-table .td.lf-tag {
 	white-space: nowrap;
+}
+
+.logview-table .td.lf-ktime {
+	text-align: right;
 }
 
 .logview-table .td.lf-message {
@@ -32,6 +33,12 @@
 	   -moz-hyphens: auto;
 	-webkit-hyphens: auto;
 	        hyphens: auto;
+}
+
+.logview-table .td ins {
+	background-color: rgba(0,255,0,0.25);
+	text-decoration: none;
+	color: #000;
 }
 
 /* alert, crit, panic, emerg */
@@ -87,3 +94,13 @@
 
 .logview-controls > div button + button { margin-left: 5px; }
 .logview-controls > div label { margin-left: 4px; margin-right: 8px; }
+
+.logview-filter {
+	display: flex;
+	flex-flow: row;
+	align-items: center;
+}
+
+.logview-filter > button, .logview-filter > input {
+	margin: 0 0 0 4px !important;
+}

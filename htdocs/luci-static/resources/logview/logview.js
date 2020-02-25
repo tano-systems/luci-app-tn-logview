@@ -53,19 +53,26 @@ function logviewTableCreate(e, fields) {
 	return table.lastElementChild;
 }
 
-function logviewTableAddRow(plugin, table, data, fields, extra_class) {
+function logviewTableAddRow(plugin, table, data, fields, extra_class, filterPattern) {
 	var lv_p_class = data.hasOwnProperty('priority')
 		? data.priority : 'none';
 
 	var r = E('div', { 'class': 'tr lv-p-' + lv_p_class + ' ' + extra_class }, []);
+	var filterMatch = true;
 
-	fields.forEach(function(field) {
+	if (typeof(filterPattern) === 'string' && filterPattern.length > 0) {
+		filterPattern = new RegExp(filterPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'ig');
+		filterMatch = false;
+	}
+
+	for (var i = 0; i < fields.length; i++) {
+		var field = fields[i];
 		var cell_data;
 
 		var key = field.name;
 
 		if (!data.hasOwnProperty(key))
-			return;
+			continue;
 
 		if (key == 'timestamp') {
 			var date = new Date(parseInt(data.timestamp) * 1000);
@@ -79,7 +86,7 @@ function logviewTableAddRow(plugin, table, data, fields, extra_class) {
 				date.getSeconds()
 			);
 
-			cell_data = E('nobr', {}, [ ts ]);
+			cell_data = ts;
 		}
 		else if (key == "priority") {
 			cell_data = priorityDisplay.hasOwnProperty(data[key])
@@ -89,16 +96,30 @@ function logviewTableAddRow(plugin, table, data, fields, extra_class) {
 			cell_data = data[key];
 		}
 
+		if (filterPattern instanceof RegExp) {
+			if (cell_data.match(filterPattern)) {
+				var node = document.createElement('span');
+				node.innerHTML = cell_data.replace(filterPattern, '<ins>$&</ins>');
+				cell_data = node;
+				filterMatch = true;
+			}
+		}
+
 		r.appendChild(E('div', { 'class': 'td top lf-' + key }, [ cell_data ]));
-	});
+	}
+
+	if (!filterMatch)
+		return 0;
 
 	if (plugin.opts.sortDescending) /* desc */
 		table.insertBefore(r, table.children[1]);
 	else /* asc */
 		table.appendChild(r);
+
+	return 1;
 }
 
-function logviewTableUpdate(plugin, logData) {
+function logviewTableUpdate(plugin, logData, filterPattern) {
 	var logDataJSON;
 
 	var tableContainer = E('div', {});
@@ -117,24 +138,37 @@ function logviewTableUpdate(plugin, logData) {
 
 		L.dom.content(plugin.opts.target, tableContainer);
 		plugin.opts.loaded = true;
+		plugin.opts.data = null;
 		return;
 	}
 
-	var row = 0;
+	var rows_filtered = 0;
+	var rows_total = logDataJSON.length;
 
 	logDataJSON.forEach(function(line) {
-		logviewTableAddRow(plugin, table, line, plugin.fields, '');
-		row++;
+		rows_filtered += logviewTableAddRow(plugin, table, line, plugin.fields, '', filterPattern);
 	});
 
-	if (!row) {
+	var info = document.querySelector('#logview-count-info-' + plugin.name);
+
+	if (!rows_total) {
 		table.appendChild(E('div', { 'class': 'tr placeholder' }, [
 			E('div', { 'class': 'td' }, _('Log is empty'))
 		]));
+	} else if (!rows_filtered && filterPattern) {
+		table.appendChild(E('div', { 'class': 'tr placeholder' }, [
+			E('div', { 'class': 'td' }, _('No entries matching \"%h\"').format(filterPattern))
+		]));
 	}
+
+	if (filterPattern)
+		info.innerHTML = _('filtered %d from %d').format(rows_filtered, rows_total);
+	else
+		info.innerHTML = '%d'.format(rows_filtered);
 
 	L.dom.content(plugin.opts.target, tableContainer);
 	plugin.opts.loaded = true;
+	plugin.opts.data = logData;
 }
 
 return L.Class.extend({
@@ -158,8 +192,10 @@ return L.Class.extend({
 						plugin.order = 999;
 
 					plugin.opts = {};
+					plugin.name = name;
 					plugin.opts.sortDescending = true;
 					plugin.opts.loaded = false;
+					plugin.opts.data = null;
 
 					logviewPlugins[name] = plugin;
 
@@ -205,14 +241,16 @@ return L.Class.extend({
 		});
 	},
 
-	refresh: function(logName, force) {
+	display: function(logName, filterPattern, force) {
 		var plugin = logviewPlugins[logName];
 
 		if (!plugin || !plugin.opts.target)
 			return Promise.resolve(null);
 
-		if (!force && plugin.opts.loaded)
+		if (!force && plugin.opts.loaded) {
+			logviewTableUpdate(plugin, plugin.opts.data, filterPattern);
 			return Promise.resolve(null);
+		}
 
 		L.dom.content(plugin.opts.target, [
 			E('p', {}, [
@@ -224,7 +262,7 @@ return L.Class.extend({
 			plugin.formats['json'].command,
 			plugin.formats['json'].args
 		).then(function(data) {
-			logviewTableUpdate(plugin, data);
+			logviewTableUpdate(plugin, data, filterPattern);
 		}).catch(function(e) {
 			L.ui.addNotification(null, E('p', e.message), 'error');
 		});

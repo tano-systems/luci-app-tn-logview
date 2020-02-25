@@ -3,6 +3,8 @@
 'require ui';
 'require logview.logview as logview';
 
+var keyTimeout = null;
+
 return L.view.extend({
 	load: function() {
 		return logview.load();
@@ -10,7 +12,9 @@ return L.view.extend({
 
 	handleTabActive: function(ev) {
 		var target = ev.target;
-		return logview.refresh(ev.detail.tab, false).then(function() {
+		var patternFilter = target.querySelector('input[name="filter"]').value;
+
+		return logview.display(ev.detail.tab, patternFilter, false).then(function() {
 			target.querySelectorAll('button, input[type="checkbox"]').forEach(function(e) {
 				e.removeAttribute('disabled');
 			});
@@ -30,7 +34,28 @@ return L.view.extend({
 	},
 
 	handleRefresh: function(logname, ev) {
-		return logview.refresh(logname, true);
+		var filterEl = document.querySelector('div[data-tab="' + logname + '"] input[name="filter"]');
+		var patternFilter = '';
+
+		if (filterEl)
+			patternFilter = filterEl.value;
+
+		return logview.display(logname, patternFilter, true);
+	},
+
+	handleFilterKeyUp: function(logname, ev) {
+		if (keyTimeout !== null)
+			window.clearTimeout(keyTimeout);
+
+		keyTimeout = window.setTimeout(function() {
+			return logview.display(logname, ev.target.value, false);
+		}, 250);
+	},
+
+	handleFilterReset: function(logname, ev) {
+		var filterEl = document.querySelector('div[data-tab="' + logname + '"] input[name="filter"]');
+		filterEl.value = '';
+		logview.display(logname, filterEl.value, false);
 	},
 
 	renderTabs: function(container) {
@@ -93,8 +118,28 @@ return L.view.extend({
 					]),
 					E('div', {}, buttons)
 				]),
+				E('div', { 'class': 'cbi-section logview-filter' }, [
+					E('label', {}, _('Filter') + ':'),
+					E('input', {
+						'type': 'text',
+						'name': 'filter',
+						'placeholder': _('Type to filter…'),
+						'value': '',
+						'keyup': L.bind(this.handleFilterKeyUp, this, log_names[i])
+					}),
+					E('button', {
+						'class': 'cbi-button cbi-button-apply',
+						'click': L.bind(this.handleFilterReset, this, log_names[i])
+					}, [ _('Clear') ])
+				]),
 				E('div', { 'class': 'cbi-section' }, [
-					E('legend', {}, _('Log Entries')), logviewTable
+					E('legend', {}, [
+						_('Log Entries'),
+						' (',
+						E('span', { 'id': 'logview-count-info-' + log_names[i] }, '?'),
+						')'
+					]),
+					logviewTable
 				]),
 			]));
 		}
