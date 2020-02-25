@@ -11,15 +11,19 @@ msgstr ""
 "Language: ru\n"
 "X-Generator: Poedit 2.2\n"
 
-#: htdocs/luci-static/resources/view/status/logview.js:92
+#: htdocs/luci-static/resources/view/status/logview.js:133
+msgid "Clear"
+msgstr "Очистить"
+
+#: htdocs/luci-static/resources/view/status/logview.js:117
 msgid "Display descending time (latest on top)"
 msgstr "Отображать по убыванию времени (последнее сверху)"
 
-#: htdocs/luci-static/resources/view/status/logview.js:65
+#: htdocs/luci-static/resources/view/status/logview.js:90
 msgid "Download (CSV)"
 msgstr "Скачать (CSV)"
 
-#: htdocs/luci-static/resources/view/status/logview.js:60
+#: htdocs/luci-static/resources/view/status/logview.js:85
 msgid "Download (TXT)"
 msgstr "Скачать (TXT)"
 
@@ -27,28 +31,32 @@ msgstr "Скачать (TXT)"
 msgid "Facility"
 msgstr "Категория"
 
-#: htdocs/luci-static/resources/logview/logview.js:180
+#: htdocs/luci-static/resources/logview/logview.js:134
 msgid "Failed to parse log data"
 msgstr "Не удалось прочитать данные журнала"
+
+#: htdocs/luci-static/resources/view/status/logview.js:122
+msgid "Filter"
+msgstr "Фильтр"
 
 #: htdocs/luci-static/resources/logview/plugins/kernel.js:4
 msgid "Kernel Log"
 msgstr "Журнал ядра"
 
-#: htdocs/luci-static/resources/logview/logview.js:217
-#: htdocs/luci-static/resources/view/status/logview.js:70
+#: htdocs/luci-static/resources/logview/logview.js:257
+#: htdocs/luci-static/resources/view/status/logview.js:95
 msgid "Loading data…"
 msgstr "Загрузка данных..."
 
-#: htdocs/luci-static/resources/view/status/logview.js:97
+#: htdocs/luci-static/resources/view/status/logview.js:137
 msgid "Log Entries"
 msgstr "Записи журнала"
 
-#: htdocs/luci-static/resources/view/status/logview.js:110
+#: htdocs/luci-static/resources/view/status/logview.js:155
 msgid "Log View"
 msgstr "Просмотр журналов"
 
-#: htdocs/luci-static/resources/logview/logview.js:198
+#: htdocs/luci-static/resources/logview/logview.js:156
 msgid "Log is empty"
 msgstr "Журнал не содержит записей"
 
@@ -61,12 +69,16 @@ msgstr "Журналы"
 msgid "Message"
 msgstr "Сообщение"
 
+#: htdocs/luci-static/resources/logview/logview.js:160
+msgid "No entries matching \"%h\""
+msgstr "Нет записей соответствующих запросу «%h»"
+
 #: htdocs/luci-static/resources/logview/plugins/kernel.js:32
 #: htdocs/luci-static/resources/logview/plugins/syslog.js:33
 msgid "Priority"
 msgstr "Приоритет"
 
-#: htdocs/luci-static/resources/view/status/logview.js:55
+#: htdocs/luci-static/resources/view/status/logview.js:80
 msgid "Refresh"
 msgstr "Обновить"
 
@@ -85,3 +97,11 @@ msgstr "Время"
 #: htdocs/luci-static/resources/logview/plugins/syslog.js:31
 msgid "Timestamp"
 msgstr "Временная метка"
+
+#: htdocs/luci-static/resources/view/status/logview.js:126
+msgid "Type to filter…"
+msgstr "Введите для фильтрации..."
+
+#: htdocs/luci-static/resources/logview/logview.js:165
+msgid "filtered %d from %d"
+msgstr "отфильтровано %d из %d"

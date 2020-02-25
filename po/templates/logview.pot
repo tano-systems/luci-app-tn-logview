@@ -1,15 +1,19 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8"
 
-#: htdocs/luci-static/resources/view/status/logview.js:92
+#: htdocs/luci-static/resources/view/status/logview.js:133
+msgid "Clear"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/status/logview.js:117
 msgid "Display descending time (latest on top)"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:65
+#: htdocs/luci-static/resources/view/status/logview.js:90
 msgid "Download (CSV)"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:60
+#: htdocs/luci-static/resources/view/status/logview.js:85
 msgid "Download (TXT)"
 msgstr ""
 
@@ -17,28 +21,32 @@ msgstr ""
 msgid "Facility"
 msgstr ""
 
-#: htdocs/luci-static/resources/logview/logview.js:180
+#: htdocs/luci-static/resources/logview/logview.js:134
 msgid "Failed to parse log data"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/status/logview.js:122
+msgid "Filter"
 msgstr ""
 
 #: htdocs/luci-static/resources/logview/plugins/kernel.js:4
 msgid "Kernel Log"
 msgstr ""
 
-#: htdocs/luci-static/resources/logview/logview.js:217
-#: htdocs/luci-static/resources/view/status/logview.js:70
+#: htdocs/luci-static/resources/logview/logview.js:257
+#: htdocs/luci-static/resources/view/status/logview.js:95
 msgid "Loading data…"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:97
+#: htdocs/luci-static/resources/view/status/logview.js:137
 msgid "Log Entries"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:110
+#: htdocs/luci-static/resources/view/status/logview.js:155
 msgid "Log View"
 msgstr ""
 
-#: htdocs/luci-static/resources/logview/logview.js:198
+#: htdocs/luci-static/resources/logview/logview.js:156
 msgid "Log is empty"
 msgstr ""
 
@@ -51,12 +59,16 @@ msgstr ""
 msgid "Message"
 msgstr ""
 
+#: htdocs/luci-static/resources/logview/logview.js:160
+msgid "No entries matching \"%h\""
+msgstr ""
+
 #: htdocs/luci-static/resources/logview/plugins/kernel.js:32
 #: htdocs/luci-static/resources/logview/plugins/syslog.js:33
 msgid "Priority"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:55
+#: htdocs/luci-static/resources/view/status/logview.js:80
 msgid "Refresh"
 msgstr ""
 
@@ -74,4 +86,12 @@ msgstr ""
 
 #: htdocs/luci-static/resources/logview/plugins/syslog.js:31
 msgid "Timestamp"
+msgstr ""
+
+#: htdocs/luci-static/resources/view/status/logview.js:126
+msgid "Type to filter…"
+msgstr ""
+
+#: htdocs/luci-static/resources/logview/logview.js:165
+msgid "filtered %d from %d"
 msgstr ""
