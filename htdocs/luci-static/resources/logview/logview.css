@@ -8,7 +8,8 @@
 	background-color: #f8f8f8;
 	font-family: monospace;
 	border: 0 !important;
-	font-size: 80%;
+	font-size: 12px;
+	line-height: 16px;
 }
 
 .logview-table .td.lf-ktime {
@@ -67,7 +68,7 @@
 
 /* debug */
 .lv-p-debug .td, .lv-p-debug.td {
-	color: #b3b3b3; /* GRAY */
+	color: #8c8c8c; /* GRAY */
 	background-color: #ededed;
 }
 
