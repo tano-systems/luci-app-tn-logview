@@ -3,7 +3,7 @@
 	min-width: 0;
 }
 
-.logview-table .td {
+.logview-table .tr:not(.placeholder) .td {
 	padding: 1px 8px;
 	background-color: #f8f8f8;
 	font-family: monospace;
@@ -12,6 +12,12 @@
 	line-height: 16px;
 	text-align: left;
 }
+
+/*.logview-table .tr.placeholder > .td {
+	line-height: 40px;
+	font-family: inherit;
+	font-size: inherit;
+}*/
 
 .logview-table .td.lf-timestamp,
 .logview-table .td.lf-tag {
@@ -36,48 +42,48 @@
 	        hyphens: auto;
 }
 
-.logview-table .td ins {
+.logview-table .tr .td ins {
 	background-color: rgba(0,255,0,0.25);
 	text-decoration: none;
 	color: #000;
 }
 
 /* alert, crit, panic, emerg */
-.lv-p-alert .td, .lv-p-alert.td,
-.lv-p-crit .td, .lv-p-crit.td,
-.lv-p-panic .td, .lv-p-panic.td,
-.lv-p-emerg .td, .lv-p-emerg.td {
+.tr.lv-p-alert .td,
+.tr.lv-p-crit .td,
+.tr.lv-p-panic .td,
+.tr.lv-p-emerg .td {
 	color: #f9e4e4; /* WHITE on RED */
 	font-weight: bold;
-	background-color: rgb(230, 0, 0);
+	background-color: rgb(230, 0, 0) !important;
 }
 
 /* err, error */
-.lv-p-err .td, .lv-p-err.td,
-.lv-p-error .td, .lv-p-error.td {
+.tr.lv-p-err .td,
+.tr.lv-p-error .td {
 	color: #651010; /* RED on RED */
-	background-color: rgba(255, 179, 179, 0.4);
+	background-color: rgba(255, 179, 179, 0.4) !important;
 }
 
 /* warn, warning */
-.lv-p-warn .td, .lv-p-warn.td,
-.lv-p-warning .td, .lv-p-warning.td {
+.tr.lv-p-warn .td,
+.tr.lv-p-warning .td {
 	color: #654f10; /* YELLOW */
-	background-color: rgba(255, 213, 153, 0.4);
+	background-color: rgba(255, 213, 153, 0.4) !important;
 }
 
 /* notice */
-.lv-p-notice .td, .lv-p-notice.td {
+.tr.lv-p-notice .td {
 	color: #104565; /* BLUE */
-	background-color: rgba(179, 224, 255, 0.4);
+	background-color: rgba(179, 224, 255, 0.4) !important;
 }
 
 /* info, none (default) */
 
 /* debug */
-.lv-p-debug .td, .lv-p-debug.td {
+.tr.lv-p-debug .td {
 	color: #8c8c8c; /* GRAY */
-	background-color: #ededed;
+	background-color: #ededed !important;
 }
 
 .logview-controls {
