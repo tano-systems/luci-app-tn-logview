@@ -66,42 +66,39 @@ function logviewTableAddRow(plugin, table, data, fields, extra_class, filterPatt
 	}
 
 	for (var i = 0; i < fields.length; i++) {
-		var field = fields[i];
-		var cell_data;
+		var cell_data = '';
+		var key = fields[i].name;
 
-		var key = field.name;
+		if (data.hasOwnProperty(key)) {
+			if (key == 'timestamp') {
+				var date = new Date(parseInt(data.timestamp) * 1000);
 
-		if (!data.hasOwnProperty(key))
-			continue;
+				var ts = '%02d.%02d.%04d %02d:%02d:%02d'.format(
+					date.getDate(),
+					date.getMonth() + 1,
+					date.getFullYear(),
+					date.getHours(),
+					date.getMinutes(),
+					date.getSeconds()
+				);
 
-		if (key == 'timestamp') {
-			var date = new Date(parseInt(data.timestamp) * 1000);
+				cell_data = ts;
+			}
+			else if (key == "priority") {
+				cell_data = priorityDisplay.hasOwnProperty(data[key])
+					? priorityDisplay[data[key]] : data[key];
+			}
+			else {
+				cell_data = data[key];
+			}
 
-			var ts = '%02d.%02d.%04d %02d:%02d:%02d'.format(
-				date.getDate(),
-				date.getMonth() + 1,
-				date.getFullYear(),
-				date.getHours(),
-				date.getMinutes(),
-				date.getSeconds()
-			);
-
-			cell_data = ts;
-		}
-		else if (key == "priority") {
-			cell_data = priorityDisplay.hasOwnProperty(data[key])
-				? priorityDisplay[data[key]] : data[key];
-		}
-		else {
-			cell_data = data[key];
-		}
-
-		if (filterPattern instanceof RegExp) {
-			if (cell_data.match(filterPattern)) {
-				var node = document.createElement('span');
-				node.innerHTML = cell_data.replace(filterPattern, '<ins>$&</ins>');
-				cell_data = node;
-				filterMatch = true;
+			if (filterPattern instanceof RegExp) {
+				if (cell_data.match(filterPattern)) {
+					var node = document.createElement('span');
+					node.innerHTML = cell_data.replace(filterPattern, '<ins>$&</ins>');
+					cell_data = node;
+					filterMatch = true;
+				}
 			}
 		}
 
