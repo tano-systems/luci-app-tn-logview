@@ -35,14 +35,19 @@ function toggleTableSorting(plugin) {
 	}
 }
 
-function logviewTableCreate(e, fields) {
+function logviewTableCreate(e, columns) {
 	while (e.firstChild)
 		e.removeChild(e.firstChild);
 
 	var tr = E('div', { 'class': 'tr table-titles' });
 
-	fields.forEach(function(f) {
-		tr.appendChild(E('div', { 'class': 'th top left' }, [ f.display ]));
+	columns.forEach(function(column) {
+		if (!column.show)
+			return;
+
+		tr.appendChild(E('div', { 'class': 'th top left lf-' + column.name }, [
+			column.display
+		]));
 	});
 
 	var table = E('div', { 'class': 'table-wrapper' }, [
@@ -53,11 +58,11 @@ function logviewTableCreate(e, fields) {
 	return table.lastElementChild;
 }
 
-function logviewTableAddRow(plugin, table, data, fields, extra_class, filterPattern) {
+function logviewTableAddRow(plugin, table, data, columns, filterPattern) {
 	var lv_p_class = data.hasOwnProperty('priority')
 		? data.priority : 'none';
 
-	var r = E('div', { 'class': 'tr lv-p-' + lv_p_class + ' ' + extra_class }, []);
+	var r = E('div', { 'class': 'tr lv-p-' + lv_p_class }, []);
 	var filterMatch = true;
 
 	if (typeof(filterPattern) === 'string' && filterPattern.length > 0) {
@@ -65,9 +70,12 @@ function logviewTableAddRow(plugin, table, data, fields, extra_class, filterPatt
 		filterMatch = false;
 	}
 
-	for (var i = 0; i < fields.length; i++) {
+	for (var i = 0; i < columns.length; i++) {
 		var cell_data = '';
-		var key = fields[i].name;
+		var key = columns[i].name;
+
+		if (!columns[i].show)
+			continue;
 
 		if (data.hasOwnProperty(key)) {
 			if (key == 'timestamp') {
@@ -117,33 +125,15 @@ function logviewTableAddRow(plugin, table, data, fields, extra_class, filterPatt
 }
 
 function logviewTableUpdate(plugin, logData, filterPattern) {
-	var logDataJSON;
-
 	var tableContainer = E('div', {});
-	var table = logviewTableCreate(tableContainer, plugin.fields);
-
-	try {
-		logDataJSON = JSON.parse(logData);
-	} catch(e) {
-		table.appendChild(E('div', { 'class': 'tr placeholder' }, [
-			E('div', { 'class': 'td' }, [
-				E('div', { 'class': 'alert-message error' }, [
-					_('Failed to parse log data')
-				])
-			])
-		]));
-
-		L.dom.content(plugin.opts.target, tableContainer);
-		plugin.opts.loaded = true;
-		plugin.opts.data = null;
-		return;
-	}
+	var table = logviewTableCreate(tableContainer, plugin.columns);
 
 	var rows_filtered = 0;
-	var rows_total = logDataJSON.length;
+	var rows_total = logData.length;
 
-	logDataJSON.forEach(function(line) {
-		rows_filtered += logviewTableAddRow(plugin, table, line, plugin.fields, '', filterPattern);
+	logData.forEach(function(line) {
+		rows_filtered += logviewTableAddRow(
+			plugin, table, line, plugin.columns, filterPattern);
 	});
 
 	var info = document.querySelector('#logview-count-info-' + plugin.name);
@@ -166,6 +156,21 @@ function logviewTableUpdate(plugin, logData, filterPattern) {
 	L.dom.content(plugin.opts.target, tableContainer);
 	plugin.opts.loaded = true;
 	plugin.opts.data = logData;
+}
+
+function getActionTask(action, type) {
+	var task = null;
+
+	if (!action)
+		return null;
+
+	if (action.hasOwnProperty('command') && action.command) {
+		task = fs.exec_direct(action.command, action.command_args || [], type);
+	} else if (action.hasOwnProperty('file') && action.file) {
+		task = fs.read_direct(action.file, type);
+	}
+
+	return task;
 }
 
 return L.Class.extend({
@@ -193,6 +198,12 @@ return L.Class.extend({
 					plugin.opts.sortDescending = true;
 					plugin.opts.loaded = false;
 					plugin.opts.data = null;
+
+					plugin.columns.forEach(function(column, index) {
+						column.index = index;
+						if (!column.hasOwnProperty('show'))
+							column.show = true;
+					});
 
 					logviewPlugins[name] = plugin;
 
@@ -238,13 +249,53 @@ return L.Class.extend({
 		});
 	},
 
-	display: function(logName, filterPattern, force) {
+	logColumns: function(logName) {
+		if (!logviewPlugins[logName])
+			return [];
+
+		return logviewPlugins[logName].columns;
+	},
+
+	setColumnVisible: function(logName, columnIndex, visible) {
+		if (!logviewPlugins[logName])
+			return;
+
+		var log = logviewPlugins[logName];
+		if (columnIndex >= log.columns.length)
+			return;
+
+		log.columns[columnIndex].show = visible;
+	},
+
+	logDownloads: function(logName) {
+		if (!logviewPlugins[logName])
+			return [];
+
+		var plugin = logviewPlugins[logName];
+
+		var downloads = [];
+
+		Object.keys(plugin.downloads).forEach(function(dl, index) {
+			downloads.push({
+				name: dl,
+				display: plugin.downloads[dl].display
+			});
+		});
+
+		if (plugin.json_data.add_to_downloads) {
+			downloads.push({ name: 'json', display: 'JSON' });
+		}
+
+		return downloads;
+	},
+
+	display: function(logName, filterPattern, forceReload) {
 		var plugin = logviewPlugins[logName];
 
 		if (!plugin || !plugin.opts.target)
 			return Promise.resolve(null);
 
-		if (!force && plugin.opts.loaded) {
+		if (!forceReload && plugin.opts.loaded) {
 			logviewTableUpdate(plugin, plugin.opts.data, filterPattern);
 			return Promise.resolve(null);
 		}
@@ -255,34 +306,43 @@ return L.Class.extend({
 			])
 		]);
 
-		return fs.exec_direct(
-			plugin.formats['json'].command,
-			plugin.formats['json'].args
-		).then(function(data) {
+		return Promise.resolve(getActionTask(plugin.json_data.action, 'json')).then(function(data) {
 			logviewTableUpdate(plugin, data, filterPattern);
 		}).catch(function(e) {
 			L.ui.addNotification(null, E('p', e.message), 'error');
 		});
 	},
 
-	download: function(logName, format) {
+	download: function(logName, downloadName) {
 		var plugin = logviewPlugins[logName];
+		var download = null;
 
-		if (!plugin || !plugin.formats[format])
-			return null;
+		if (!plugin)
+			return null
+			
+		if (!plugin.downloads.hasOwnProperty(downloadName))
+		{
+			if ((downloadName === 'json') && plugin.json_data.add_to_downloads) {
+				download = {
+					action: plugin.json_data.action,
+					mime_type: 'application/json',
+					extension: 'json'
+				};
+			}
+			else
+				return null;
+		}
+		else
+			download = plugin.downloads[downloadName];
 
-		return fs.exec_direct(
-			plugin.formats[format].command,
-			plugin.formats[format].args,
-			'blob'
-		).then(function(res) {
+		return Promise.resolve(getActionTask(download.action, 'blob')).then(function(res) {
 			var url = URL.createObjectURL(new Blob([res], {
-				type: plugin.formats[format].mime_type
+				type: download.mime_type
 			}));
 
 			var link = document.createElement('a');
 			link.href = url;
-			link.download = logName + '.' + plugin.formats[format].extension;
+			link.download = logName + '.' + download.extension;
 			link.click();
 		}).catch(function(e) {
 			L.ui.addNotification(null, E('p', e.message), 'error');

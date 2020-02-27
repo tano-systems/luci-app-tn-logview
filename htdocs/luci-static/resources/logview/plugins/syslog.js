@@ -2,32 +2,36 @@
 
 return L.Class.extend({
 	title: _('System Log'),
-	order: 2,
 	description: '',
-	formats: {
-		'json': {
-			'name': 'JSON',
-			'mime_type': 'application/json',
-			'extension': 'json',
-			'command': '/usr/libexec/luci-logview/logview-syslog',
-			'args': [ 'json' ]
-		},
-		'plain': {
-			'name': 'TXT',
-			'mime_type': 'text/plain',
-			'extension': 'txt',
-			'command': '/usr/libexec/luci-logview/logview-syslog',
-			'args': [ 'plain' ]
-		},
-		'csv': {
-			'name': 'CSV',
-			'mime_type': 'text/csv',
-			'extension': 'csv',
-			'command': '/usr/libexec/luci-logview/logview-syslog',
-			'args': [ 'csv' ]
+	order: 2,
+	json_data: {
+		add_to_downloads: true,
+		action: {
+			command: '/usr/libexec/luci-logview/logview-syslog',
+			command_args: [ 'json' ]
 		}
 	},
-	fields: [
+	downloads: {
+		'raw': {
+			display: 'RAW',
+			mime_type: 'text/plain',
+			extension: 'txt',
+			action: {
+				command: '/usr/libexec/luci-logview/logview-syslog',
+				command_args: [ 'plain' ]
+			}
+		},
+		'csv': {
+			display: 'CSV',
+			mime_type: 'text/csv',
+			extension: 'csv',
+			action: {
+				command: '/usr/libexec/luci-logview/logview-syslog',
+				command_args: [ 'csv' ]
+			}
+		}
+	},
+	columns: [
 		{ name: 'timestamp', display: _('Timestamp') },
 		{ name: 'tag', display: _('Tag') },
 		{ name: 'priority', display: _('Priority') },

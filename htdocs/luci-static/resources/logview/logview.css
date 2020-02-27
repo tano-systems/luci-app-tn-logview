@@ -13,12 +13,6 @@
 	text-align: left;
 }
 
-/*.logview-table .tr.placeholder > .td {
-	line-height: 40px;
-	font-family: inherit;
-	font-size: inherit;
-}*/
-
 .logview-table .td.lf-timestamp,
 .logview-table .td.lf-tag {
 	white-space: nowrap;
@@ -99,15 +93,52 @@
 	flex-flow: row;
 }
 
-.logview-controls > div button + button { margin-left: 5px; }
+.logview-controls > div .cbi-button + .cbi-button { margin-left: 5px; }
 .logview-controls > div label { margin-left: 4px; margin-right: 8px; }
 
 .logview-filter {
 	display: flex;
 	flex-flow: row;
 	align-items: center;
+	margin-top: 10px;
 }
 
 .logview-filter > button, .logview-filter > input {
 	margin: 0 0 0 4px !important;
 }
+
+.logview-columns {
+	display: flex;
+	flex-wrap: nowrap;
+	margin-top: 10px;
+}
+
+.logview-columns > label {
+	margin-right: 4px;
+	margin-top: 5px;
+	align-self: flex-start;
+	white-space: nowrap;
+	flex-basis: 0;
+}
+
+.logview-columns > div {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.logview-columns > div > div {
+	align-items: center;
+	display: flex;
+	flex-flow: row;
+	padding: 2px 6px;
+	margin: 2px 4px 2px 0;
+	border-radius: 5px;
+	border: 1px solid #e6e6e6;
+}
+
+.logview-columns > div > div.column-active {
+	background: #e6e6e6;
+}
+
+.logview-columns > div > div > label { margin-left: 4px; white-space: nowrap; }
+.logview-columns > div > div > input[type="checkbox"] { height: auto; }

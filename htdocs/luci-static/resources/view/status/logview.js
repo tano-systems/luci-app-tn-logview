@@ -7,55 +7,79 @@ var keyTimeout = null;
 
 return L.view.extend({
 	load: function() {
+		this.logs = {};
 		return logview.load();
 	},
 
 	handleTabActive: function(ev) {
+		var log = this.logs[ev.detail.tab];
 		var target = ev.target;
-		var patternFilter = target.querySelector('input[name="filter"]').value;
 
-		return logview.display(ev.detail.tab, patternFilter, false).then(function() {
-			target.querySelectorAll('button, input[type="checkbox"]').forEach(function(e) {
+		return logview.display(log.name, log.filter, false).then(function() {
+			target.querySelectorAll('.cbi-button, input[type="checkbox"]').forEach(function(e) {
 				e.removeAttribute('disabled');
 			});
 		});
 	},
 
-	handleDownload: function(logname, format, extension, ev) {
-		return logview.download(logname, format);
+	handleDownload: function(log, ev, dlname) {
+		return logview.download(log.name, dlname);
 	},
 
-	handleSortingToggle: function(logname, ev) {
+	handleSortingToggle: function(log, ev) {
 		var checked = ev.target.checked;
 
 		ev.target.setAttribute('disabled', true);
-		logview.setSorting(logname, checked);
+		logview.setSorting(log.name, checked);
 		ev.target.removeAttribute('disabled');
 	},
 
-	handleRefresh: function(logname, ev) {
-		var filterEl = document.querySelector('div[data-tab="' + logname + '"] input[name="filter"]');
-		var patternFilter = '';
-
-		if (filterEl)
-			patternFilter = filterEl.value;
-
-		return logview.display(logname, patternFilter, true);
+	handleRefresh: function(log, ev) {
+		return logview.display(log.name, log.filter, true);
 	},
 
-	handleFilterKeyUp: function(logname, ev) {
+	handleFilterKeyUp: function(log, ev) {
 		if (keyTimeout !== null)
 			window.clearTimeout(keyTimeout);
 
 		keyTimeout = window.setTimeout(function() {
-			return logview.display(logname, ev.target.value, false);
+			log.filter = ev.target.value;
+			return logview.display(log.name, log.filter, false);
 		}, 250);
 	},
 
-	handleFilterReset: function(logname, ev) {
-		var filterEl = document.querySelector('div[data-tab="' + logname + '"] input[name="filter"]');
-		filterEl.value = '';
-		logview.display(logname, filterEl.value, false);
+	handleFilterReset: function(log, ev) {
+		log.filter = '';
+		logview.display(log.name, log.filter, false);
+	},
+
+	handleColumnToggle: function(log, column/*name*/, ev) {
+		var checked = ev.target.checked;
+
+		if (checked)
+			ev.target.parentNode.classList.add('column-active');
+		else
+			ev.target.parentNode.classList.remove('column-active');
+
+		if (checked) {
+			logview.setColumnVisible(log.name, column.index, true);
+			log.columns_visible++;
+
+			if (log.columns_visible == 2) {
+				var checkbox = ev.target.parentNode.parentNode.querySelector('input[disabled="disabled"]');
+				checkbox.removeAttribute('disabled');
+			}
+		} else {
+			logview.setColumnVisible(log.name, column.index, false);
+			log.columns_visible--;
+
+			if (log.columns_visible == 1) {
+				var checkbox = ev.target.parentNode.parentNode.querySelector('input:checked');
+				checkbox.setAttribute('disabled', 'disabled');
+			}
+		}
+
+		logview.display(log.name, log.filter, false);
 	},
 
 	renderTabs: function(container) {
@@ -72,22 +96,41 @@ return L.view.extend({
 			if (!logview.hasPlugin(log_names[i]))
 				continue;
 
+			this.logs[log_names[i]] = { name: log_names[i] };
+			var log = this.logs[log_names[i]];
+
+			var downloads = {
+				value: null,
+				choices: {},
+				options: {
+					click: ui.createHandlerFn(this, 'handleDownload', log),
+					classes: {}
+				}
+			};
+
+			logview.logDownloads(log.name).forEach(function(dl) {
+				if (!downloads.value)
+					downloads.value = dl.name;
+
+				downloads.choices[dl.name] = '%s (%s)'.format(_('Download'), dl.display);
+				downloads.options.classes[dl.name] = 'cbi-button cbi-button-action';
+			});
+
+			var downloadsButton = new ui.ComboButton(
+				downloads.value,
+				downloads.choices,
+				downloads.options
+			).render();
+
+			downloadsButton.setAttribute('disabled', 'disabled');
+
 			var buttons = [
 				E('button', {
-					'class': 'cbi-button cbi-button-apply',
-					'click': ui.createHandlerFn(this, 'handleRefresh', log_names[i]),
+					'class': 'cbi-button cbi-button-action',
+					'click': ui.createHandlerFn(this, 'handleRefresh', log),
 					'disabled': 'disabled'
 				}, _('Refresh')),
-				E('button', {
-					'class': 'cbi-button cbi-button-apply',
-					'click': ui.createHandlerFn(this, 'handleDownload', log_names[i], 'plain', 'txt'),
-					'disabled': 'disabled'
-				}, _('Download (TXT)')),
-				E('button', {
-					'class': 'cbi-button cbi-button-apply',
-					'click': ui.createHandlerFn(this, 'handleDownload', log_names[i], 'csv', 'csv'),
-					'disabled': 'disabled'
-				}, _('Download (CSV)'))
+				downloadsButton
 			];
 
 			var logviewTable = E('div', { 'class': 'logview-table' }, [
@@ -96,47 +139,75 @@ return L.view.extend({
 				])
 			]);
 
-			logview.setTarget(log_names[i], logviewTable);
+			log.target = logviewTable;
+			log.columns = logview.logColumns(log.name);
+			log.columns_visible = 0;
+			log.filter = '';
+
+			logview.setTarget(log.name, log.target);
+
+			var logviewColumns = [];
+			log.columns.forEach(L.bind(function(column) {
+				if (column.show)
+					log.columns_visible++;
+
+				var id = 'column-toggle-' + log.name + column.name;
+				logviewColumns.push(
+					E('div', { 'class': column.show ? 'column-active' : '' }, [
+						E('input', {
+							'id': id,
+							'type': 'checkbox',
+							'checked': column.show ? 'checked' : null,
+							'click': ui.createHandlerFn(this, 'handleColumnToggle', log, column)
+						}),
+						E('label', { 'for': id }, column.display)
+					])
+				);
+			}, this));
 
 			container.appendChild(E('div', {
 				'data-tab': log_names[i],
-				'data-tab-title': logview.logTitle(log_names[i]),
+				'data-tab-title': logview.logTitle(log.name),
 				'cbi-tab-active': L.bind(this.handleTabActive, this)
 			}, [
 				E('div', { 'class': 'cbi-section logview-controls' }, [
 					E('div', {}, [
 						E('input', {
 							'type': 'checkbox',
-							'id': 'sorting-toggle-' + log_names[i],
-							'name': 'sorting-toggle-' + log_names[i],
+							'id': 'sorting-toggle-' + log.name,
+							'name': 'sorting-toggle-' + log.name,
 							'checked': 'checked',
 							'disabled': 'disabled',
-							'click': L.bind(this.handleSortingToggle, this, log_names[i])
+							'click': L.bind(this.handleSortingToggle, this, log)
 						}),
-						E('label', { 'for': 'sorting-toggle-' + log_names[i] },
+						E('label', { 'for': 'sorting-toggle-' + log.name },
 							_('Display descending time (latest on top)'))
 					]),
 					E('div', {}, buttons)
 				]),
+				E('div', { 'class': 'cbi-section logview-columns' }, [
+					E('label', {}, _('Display columns') + ':'),
+					E('div', {}, logviewColumns)
+				]),
 				E('div', { 'class': 'cbi-section logview-filter' }, [
-					E('label', {}, _('Filter') + ':'),
+					E('label', {}, _('Entries filter') + ':'),
 					E('input', {
 						'type': 'text',
 						'name': 'filter',
 						'placeholder': _('Type to filter…'),
 						'value': '',
-						'keyup': L.bind(this.handleFilterKeyUp, this, log_names[i])
+						'keyup': L.bind(this.handleFilterKeyUp, this, log)
 					}),
 					E('button', {
-						'class': 'cbi-button cbi-button-apply',
-						'click': L.bind(this.handleFilterReset, this, log_names[i])
+						'class': 'cbi-button cbi-button-action',
+						'click': L.bind(this.handleFilterReset, this, log)
 					}, [ _('Clear') ])
 				]),
 				E('div', { 'class': 'cbi-section' }, [
 					E('legend', {}, [
 						_('Log Entries'),
 						' (',
-						E('span', { 'id': 'logview-count-info-' + log_names[i] }, '?'),
+						E('span', { 'id': 'logview-count-info-' + log.name }, '?'),
 						')'
 					]),
 					logviewTable
@@ -152,7 +223,7 @@ return L.view.extend({
 
 		var view = E([], [
 			E('link', { 'rel': 'stylesheet', 'href': L.resource('logview/logview.css')}),
-			E('h2', {}, [ _('Log View') ]),
+			E('h2', {}, [ _('Logs View') ]),
 			logTabs
 		]);
 
