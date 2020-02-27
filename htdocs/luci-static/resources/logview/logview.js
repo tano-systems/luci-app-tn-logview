@@ -129,9 +129,11 @@ function logviewTableUpdate(plugin, logData, filterPattern) {
 	var table = logviewTableCreate(tableContainer, plugin.columns);
 
 	var rows_filtered = 0;
+	var row = 1;
 	var rows_total = logData.length;
 
 	logData.forEach(function(line) {
+		line.number = (row++).toString();
 		rows_filtered += logviewTableAddRow(
 			plugin, table, line, plugin.columns, filterPattern);
 	});
@@ -198,6 +200,11 @@ return L.Class.extend({
 					plugin.opts.sortDescending = true;
 					plugin.opts.loaded = false;
 					plugin.opts.data = null;
+
+					plugin.columns.unshift({
+						name: 'number',
+						display: '№'
+					});
 
 					plugin.columns.forEach(function(column, index) {
 						column.index = index;
