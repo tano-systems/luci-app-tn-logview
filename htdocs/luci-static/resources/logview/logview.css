@@ -142,3 +142,18 @@
 
 .logview-columns > div > div > label { margin-left: 4px; white-space: nowrap; }
 .logview-columns > div > div > input[type="checkbox"] { height: auto; }
+
+/* Expanded view toggle button */
+.logview > h2 {
+	display: flex;
+	flex-flow: row;
+	justify-content: space-between;
+}
+
+.logview > h2 > a > svg {
+	pointer-events: none;
+	width: 18px;
+	height: 18px;
+	vertical-align: middle;
+	fill: #444;
+}

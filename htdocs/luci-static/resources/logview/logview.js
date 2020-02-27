@@ -45,7 +45,7 @@ function logviewTableCreate(e, columns) {
 		if (!column.show)
 			return;
 
-		tr.appendChild(E('div', { 'class': 'th top left lf-' + column.name }, [
+		tr.appendChild(E('div', { 'class': 'th top lf-' + column.name }, [
 			column.display
 		]));
 	});
