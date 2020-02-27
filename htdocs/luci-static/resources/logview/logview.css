@@ -3,11 +3,17 @@
 	min-width: 0;
 }
 
+.logview-table .tr.table-titles .th:last-child {
+	width: 100%;
+}
+
 .logview-table .tr:not(.placeholder) .td {
 	padding: 1px 8px;
 	background-color: #f8f8f8;
 	font-family: monospace;
-	border: 0 !important;
+/*	border: 0 !important;                       */
+	border-top: 0 !important;
+	border-bottom: 1px solid #e6e6e6 !important;
 	font-size: 12px;
 	line-height: 16px;
 	text-align: left;
@@ -18,7 +24,8 @@
 	white-space: nowrap;
 }
 
-.logview-table .td.lf-ktime {
+.logview-table .tr .td.lf-ktime,
+.logview-table .tr .td.lf-number {
 	text-align: right;
 }
 
@@ -94,7 +101,12 @@
 }
 
 .logview-controls > div .cbi-button + .cbi-button { margin-left: 5px; }
-.logview-controls > div label { margin-left: 4px; margin-right: 8px; }
+
+.logview-controls > div label {
+	padding-left: 4px;
+	margin-left: 0;
+	margin-right: 8px;
+}
 
 .logview-filter {
 	display: flex;
@@ -133,14 +145,14 @@
 	padding: 2px 6px;
 	margin: 2px 4px 2px 0;
 	border-radius: 5px;
-	border: 1px solid #e6e6e6;
+	border: 1px solid #a6a6a6;
 }
 
 .logview-columns > div > div.column-active {
 	background: #e6e6e6;
 }
 
-.logview-columns > div > div > label { margin-left: 4px; white-space: nowrap; }
+.logview-columns > div > div > label { padding-left: 4px; margin-left: 0; white-space: nowrap; }
 .logview-columns > div > div > input[type="checkbox"] { height: auto; }
 
 /* Expanded view toggle button */
@@ -148,6 +160,7 @@
 	display: flex;
 	flex-flow: row;
 	justify-content: space-between;
+	cursor: pointer;
 }
 
 .logview > h2 > a > svg {
@@ -156,4 +169,18 @@
 	height: 18px;
 	vertical-align: middle;
 	fill: #444;
+}
+
+.logview-controls > div input[type="checkbox"],
+.logview-controls > div label,
+.logview-columns > div > div > input,
+.logview-columns > div > div > label {
+	cursor: pointer;
+}
+
+.logview-controls > div input[disabled="disabled"],
+.logview-controls > div input[disabled="disabled"] + label,
+.logview-columns > div > div > input[disabled="disabled"],
+.logview-columns > div > div > input[disabled="disabled"] + label {
+	cursor: not-allowed;
 }
