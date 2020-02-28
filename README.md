@@ -12,6 +12,12 @@ This application requires a installed [Syslog File Converter](https://github.com
 - Russian
 - English
 
+## Supported (tested) themes
+- [luci-theme-tano](https://github.com/tano-systems/luci-theme-tano)
+- luci-theme-bootstrap
+- luci-theme-material
+- luci-theme-openwrt
+
 ## Screenshots
 
 ### Logs View
