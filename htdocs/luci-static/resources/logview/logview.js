@@ -6,18 +6,18 @@
 var logviewPlugins = {};
 
 var priorityDisplay = {
-	"panic"   : "Panic",
-	"emerg"   : "Emergency",
-	"crit"    : "Critical",
-	"alert"   : "Alert",
-	"err"     : "Error",
-	"error"   : "Error",
-	"warn"    : "Warning",
-	"warning" : "Warning",
-	"notice"  : "Notice",
-	"info"    : "Info",
-	"none"    : "Info",
-	"debug"   : "Debug",
+	'panic'   : 'Panic',
+	'emerg'   : 'Emergency',
+	'crit'    : 'Critical',
+	'alert'   : 'Alert',
+	'err'     : 'Error',
+	'error'   : 'Error',
+	'warn'    : 'Warning',
+	'warning' : 'Warning',
+	'notice'  : 'Notice',
+	'info'    : 'Info',
+	'none'    : 'None',
+	'debug'   : 'Debug',
 };
 
 function toggleTableSorting(plugin) {
@@ -59,10 +59,12 @@ function logviewTableCreate(e, columns) {
 }
 
 function logviewTableAddRow(plugin, table, data, columns, filterPattern) {
-	var lv_p_class = data.hasOwnProperty('priority')
-		? data.priority : 'none';
+	var priority = data.hasOwnProperty('priority') ? data.priority.trim() : 'none';
 
-	var r = E('div', { 'class': 'tr lv-p-' + lv_p_class }, []);
+	if (priority == '')
+		priority = 'none';
+
+	var r = E('div', { 'class': 'tr lv-p-' + priority }, []);
 	var filterMatch = true;
 
 	if (typeof(filterPattern) === 'string' && filterPattern.length > 0) {
@@ -92,7 +94,7 @@ function logviewTableAddRow(plugin, table, data, columns, filterPattern) {
 
 				cell_data = ts;
 			}
-			else if (key == "priority") {
+			else if (key == 'priority') {
 				cell_data = priorityDisplay.hasOwnProperty(data[key])
 					? priorityDisplay[data[key]] : data[key];
 			}
@@ -116,6 +118,23 @@ function logviewTableAddRow(plugin, table, data, columns, filterPattern) {
 	if (!filterMatch)
 		return 0;
 
+	/* Checking for priority visibility and update priorities count */
+	if (priority !== 'none') { /* line.hasOwnProperty('priority') */
+		if (plugin.priorities.hasOwnProperty(priority))
+			plugin.priorities[priority].count++;
+		else {
+			plugin.priorities[priority] = {
+				'count': 1,
+				'display': priorityDisplay.hasOwnProperty(priority)
+					? priorityDisplay[priority]
+					: priority
+			};
+		}
+
+		if (plugin.priorities[priority].hide)
+			return 0;
+	}
+
 	if (plugin.opts.sortDescending) /* desc */
 		table.insertBefore(r, table.children[1]);
 	else /* asc */
@@ -131,6 +150,11 @@ function logviewTableUpdate(plugin, logData, filterPattern) {
 	var rows_filtered = 0;
 	var row = 1;
 	var rows_total = logData.length;
+
+	/* Clear all priorities count */
+	Object.keys(plugin.priorities).forEach(function(priority) {
+		plugin.priorities[priority].count = 0;
+	});
 
 	logData.forEach(function(line) {
 		line.number = (row++).toString();
@@ -150,10 +174,11 @@ function logviewTableUpdate(plugin, logData, filterPattern) {
 		]));
 	}
 
-	if (filterPattern)
+	if (rows_total && (rows_filtered != rows_total)) {
 		info.innerHTML = _('filtered %d from %d').format(rows_filtered, rows_total);
-	else
+	} else {
 		info.innerHTML = '%d'.format(rows_filtered);
+	}
 
 	L.dom.content(plugin.opts.target, tableContainer);
 	plugin.opts.loaded = true;
@@ -200,6 +225,8 @@ return L.Class.extend({
 					plugin.opts.sortDescending = true;
 					plugin.opts.loaded = false;
 					plugin.opts.data = null;
+
+					plugin.priorities = {};
 
 					plugin.columns.unshift({
 						name: 'number',
@@ -267,11 +294,27 @@ return L.Class.extend({
 		if (!logviewPlugins[logName])
 			return;
 
-		var log = logviewPlugins[logName];
-		if (columnIndex >= log.columns.length)
+		var plugin = logviewPlugins[logName];
+		if (columnIndex >= plugin.columns.length)
 			return;
 
-		log.columns[columnIndex].show = visible;
+		plugin.columns[columnIndex].show = visible;
+	},
+
+	logPriorities: function(logName) {
+		if (!logviewPlugins[logName])
+			return {};
+
+		return logviewPlugins[logName].priorities;
+	},
+
+	setPriorityVisible: function(logName, priority, visible) {
+		if (!logviewPlugins[logName])
+			return;
+
+		var plugin = logviewPlugins[logName];
+		if (plugin.priorities.hasOwnProperty(priority))
+			plugin.priorities[priority].hide = !visible;
 	},
 
 	logDownloads: function(logName) {

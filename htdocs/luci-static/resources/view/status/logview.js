@@ -53,11 +53,14 @@ return L.view.extend({
 		var log = this.logs[ev.detail.tab];
 		var target = ev.target;
 
-		return logview.display(log.name, log.filter, false).then(function() {
+		return logview.display(log.name, log.filter, false).then(L.bind(function() {
 			target.querySelectorAll('.cbi-button, input[type="checkbox"]').forEach(function(e) {
 				e.removeAttribute('disabled');
 			});
-		});
+
+			if (log.priorities_filter)
+				this.updatePriorities(log);
+		}, this));
 	},
 
 	handleDownload: function(log, ev, dlname) {
@@ -73,49 +76,126 @@ return L.view.extend({
 	},
 
 	handleRefresh: function(log, ev) {
-		return logview.display(log.name, log.filter, true);
+		if (log.priorities_filter) {
+			/* Add spinner to priorities filter */
+			var node = document.querySelector('div[data-tab="' + log.name + '"] div.logview-priorities > div');
+			L.dom.content(node, E('em', { 'class': 'spinning' }, _('Loading data…')));
+		}
+
+		return logview.display(log.name, log.filter, true).then(L.bind(function() {
+			if (log.priorities_filter)
+				this.updatePriorities(log);
+		}, this));
 	},
 
 	handleFilterKeyUp: function(log, ev) {
 		if (keyTimeout !== null)
 			window.clearTimeout(keyTimeout);
 
-		keyTimeout = window.setTimeout(function() {
+		keyTimeout = window.setTimeout(L.bind(function() {
 			log.filter = ev.target.value;
-			return logview.display(log.name, log.filter, false);
-		}, 250);
+			return logview.display(log.name, log.filter, false).then(L.bind(function() {
+				if (log.priorities_filter)
+					this.updatePriorities(log);
+			}, this));
+		}, this), 250);
 	},
 
 	handleFilterReset: function(log, ev) {
 		log.filter = '';
 		var filterEl = document.querySelector('div[data-tab="' + log.name + '"] input[name="filter"]');
 		filterEl.value = log.filter;
+		logview.display(log.name, log.filter, false).then(L.bind(function() {
+			if (log.priorities_filter)
+				this.updatePriorities(log);
+		}, this));
+	},
+
+	handlePriorityToggle: function(log, priority, ev) {
+		if (!log.priorities_filter)
+			return;
+
+		if (ev.target.getAttribute('disabled') == 'disabled')
+			return;
+
+		var checked = (ev.target.getAttribute('data-hide') === 'true');
+
+		if (checked) {
+			log.priorities_visible++;
+			ev.target.classList.add('cb-active');
+			ev.target.setAttribute('data-hide', false);
+			logview.setPriorityVisible(log.name, priority, checked);
+		} else {
+			/* Uncheck prioritiy */
+			if (log.priorities_visible == 1) {
+				/*
+				 * Unchecked last one priority
+				 * Enable all priorities
+				 */
+				log.priorities_visible = log.priorities_total;
+
+				Object.keys(logview.logPriorities(log.name)).forEach(function(p) {
+					logview.setPriorityVisible(log.name, p, true);
+				});
+
+				ev.target.parentNode.querySelectorAll('div:not(.cb-active)').forEach(function(e) {
+					e.classList.add('cb-active');
+					e.setAttribute('data-hide', false);
+				});
+			} else if (log.priorities_visible == log.priorities_total) {
+				/*
+				 * Unchecked priority when all priorities is checked
+				 * Enable only clicked priority
+				 */
+				log.priorities_visible = 1;
+
+				ev.target.parentNode.querySelectorAll('.cb-active').forEach(function(e) {
+					if (e !== ev.target) {
+						e.classList.remove('cb-active');
+						e.setAttribute('data-hide', true);
+					}
+				});
+
+				Object.keys(logview.logPriorities(log.name)).forEach(function(p) {
+					logview.setPriorityVisible(log.name, p, (p == priority) ? true : false);
+				});
+
+			} else {
+				log.priorities_visible--;
+				ev.target.classList.remove('cb-active');
+				ev.target.setAttribute('data-hide', true);
+				logview.setPriorityVisible(log.name, priority, checked);
+			}
+		}
+
 		logview.display(log.name, log.filter, false);
 	},
 
-	handleColumnToggle: function(log, column/*name*/, ev) {
-		var checked = ev.target.checked;
+	handleColumnToggle: function(log, column, ev) {
+		if (ev.target.getAttribute('disabled') == 'disabled')
+			return;
+
+		var checked = (ev.target.getAttribute('data-hide') === 'true')
 
 		if (checked)
-			ev.target.parentNode.classList.add('column-active');
+			ev.target.classList.add('cb-active');
 		else
-			ev.target.parentNode.classList.remove('column-active');
+			ev.target.classList.remove('cb-active');
+
+		ev.target.setAttribute('data-hide', !checked);
+		logview.setColumnVisible(log.name, column.index, checked);
 
 		if (checked) {
-			logview.setColumnVisible(log.name, column.index, true);
 			log.columns_visible++;
-
 			if (log.columns_visible == 2) {
-				var checkbox = ev.target.parentNode.parentNode.querySelector('input[disabled="disabled"]');
-				checkbox.removeAttribute('disabled');
+				var node = ev.target.parentNode.querySelector('div[disabled="disabled"]');
+				node.removeAttribute('disabled');
 			}
 		} else {
-			logview.setColumnVisible(log.name, column.index, false);
 			log.columns_visible--;
-
 			if (log.columns_visible == 1) {
-				var checkbox = ev.target.parentNode.parentNode.querySelector('input:checked');
-				checkbox.setAttribute('disabled', 'disabled');
+				var node = ev.target.parentNode.querySelector('div.cb-active');
+				node.setAttribute('disabled', 'disabled');
 			}
 		}
 
@@ -150,6 +230,36 @@ return L.view.extend({
 			view.style.overflowY = 'scroll';
 			ev.target.innerHTML = svgCompress;
 		}
+	},
+
+	updatePriorities: function(log) {
+		if (!log.priorities_filter)
+			return;
+
+		var priorities = logview.logPriorities(log.name);
+		var logviewPriorities = [];
+
+		log.priorities_visible = 0;
+		log.priorities_total = 0;
+
+		Object.keys(priorities).forEach(L.bind(function(p) {
+			log.priorities_total++;
+			if (!priorities[p].hide)
+				log.priorities_visible++;
+
+			logviewPriorities.push(
+				E('div', {
+					'class': 'lv-p-' + p + (priorities[p].hide ? '' : ' cb-active'),
+					'data-hide': priorities[p].hide ? true : false,
+					'data-count': priorities[p].count,
+					'click': ui.createHandlerFn(this, 'handlePriorityToggle', log, p)
+				}, [ priorities[p].display + ' (%d)'.format(priorities[p].count) ])
+			);
+		}, this));
+
+		/* div[data-tab="..." .logview-priorities > div > ... */
+		var node = document.querySelector('div[data-tab="' + log.name + '"] div.logview-priorities > div');
+		L.dom.content(node, logviewPriorities);
 	},
 
 	renderTabs: function(container) {
@@ -199,7 +309,8 @@ return L.view.extend({
 				E('button', {
 					'class': 'cbi-button cbi-button-action',
 					'click': ui.createHandlerFn(this, 'handleRefresh', log),
-					'disabled': 'disabled'
+					'disabled': 'disabled',
+					'title': _('Reload log contents')
 				}, _('Refresh')),
 				downloadsButton
 			];
@@ -213,6 +324,7 @@ return L.view.extend({
 			log.target = logviewTable;
 			log.columns = logview.logColumns(log.name);
 			log.columns_visible = 0;
+			log.priorities_filter = false;
 			log.filter = '';
 
 			logview.setTarget(log.name, log.target);
@@ -222,19 +334,22 @@ return L.view.extend({
 				if (column.show)
 					log.columns_visible++;
 
-				var id = 'column-toggle-' + log.name + column.name;
+				if (column.name == 'priority')
+					log.priorities_filter = true;
+
 				logviewColumns.push(
-					E('div', { 'class': column.show ? 'column-active' : '' }, [
-						E('input', {
-							'id': id,
-							'type': 'checkbox',
-							'checked': column.show ? 'checked' : null,
-							'click': ui.createHandlerFn(this, 'handleColumnToggle', log, column)
-						}),
-						E('label', { 'for': id }, column.display)
-					])
+					E('div', {
+						'class': column.show ? 'cb-active' : '',
+						'data-hide': column.show ? false : true,
+						'click': ui.createHandlerFn(this, 'handleColumnToggle', log, column)
+					}, [ column.display ])
 				);
 			}, this));
+
+			if (log.priorities_filter) {
+				log.priorities_visible = 0;
+				log.priorities_total = 0;
+			}
 
 			container.appendChild(E('div', {
 				'data-tab': log_names[i],
@@ -256,9 +371,15 @@ return L.view.extend({
 					]),
 					E('div', {}, buttons)
 				]),
-				E('div', { 'class': 'cbi-section logview-columns' }, [
-					E('label', {}, _('Display columns') + ':'),
-					E('div', {}, logviewColumns)
+				E('div', { 'class': 'logview-cbfitlers-container' }, [
+					log.priorities_filter ? E('div', { 'class': 'cbi-section logview-cbfilter logview-priorities' }, [
+						E('label', {}, _('Display priorities') + ':'),
+						E('div', {}, E('em', { 'class': 'spinning' }, _('Loading data…')))
+					]) : '',
+					E('div', { 'class': 'cbi-section logview-cbfilter logview-columns' }, [
+						E('label', {}, _('Display columns') + ':'),
+						E('div', {}, logviewColumns)
+					])
 				]),
 				E('div', { 'class': 'cbi-section logview-filter' }, [
 					E('label', {}, _('Entries filter') + ':'),

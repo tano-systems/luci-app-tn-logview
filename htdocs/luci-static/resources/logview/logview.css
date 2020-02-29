@@ -11,7 +11,6 @@
 	padding: 1px 8px;
 	background-color: #f8f8f8;
 	font-family: monospace;
-/*	border: 0 !important;                       */
 	border-top: 0 !important;
 	border-bottom: 1px solid #e6e6e6 !important;
 	font-size: 12px;
@@ -50,31 +49,31 @@
 }
 
 /* alert, crit, panic, emerg */
-.tr.lv-p-alert .td,
-.tr.lv-p-crit .td,
-.tr.lv-p-panic .td,
-.tr.lv-p-emerg .td {
+.lv-p-alert, .lv-p-alert > .td,
+.lv-p-crit, .lv-p-crit > .td,
+.lv-p-panic, .lv-p-panic > .td,
+.lv-p-emerg, .lv-p-emerg > .td {
 	color: #f9e4e4; /* WHITE on RED */
 	font-weight: bold;
 	background-color: rgb(230, 0, 0) !important;
 }
 
 /* err, error */
-.tr.lv-p-err .td,
-.tr.lv-p-error .td {
+.lv-p-err, .lv-p-err > .td,
+.lv-p-error, .lv-p-error > .td {
 	color: #651010; /* RED on RED */
 	background-color: rgba(255, 179, 179, 0.4) !important;
 }
 
 /* warn, warning */
-.tr.lv-p-warn .td,
-.tr.lv-p-warning .td {
+.lv-p-warn, .lv-p-warn > .td,
+.lv-p-warning, .lv-p-warning > .td {
 	color: #654f10; /* YELLOW */
 	background-color: rgba(255, 213, 153, 0.4) !important;
 }
 
 /* notice */
-.tr.lv-p-notice .td {
+.lv-p-notice, .lv-p-notice > .td {
 	color: #104565; /* BLUE */
 	background-color: rgba(179, 224, 255, 0.4) !important;
 }
@@ -82,7 +81,7 @@
 /* info, none (default) */
 
 /* debug */
-.tr.lv-p-debug .td {
+.lv-p-debug, .lv-p-debug > .td {
 	color: #8c8c8c; /* GRAY */
 	background-color: #ededed !important;
 }
@@ -116,50 +115,77 @@
 }
 
 .logview-filter > button, .logview-filter > input {
-	margin: 0 0 0 4px !important;
+	margin: 0 0 0 6px !important;
 }
 
-.logview-columns {
+.logview-cbfitlers-container {
 	display: flex;
+	flex-flow: row;
+	justify-content: space-between;
+}
+
+.logview-cbfitlers-container > div {
+	margin-right: 12px;
+}
+
+.logview-cbfitlers-container > div:last-child {
+	margin-right: 0;
+}
+
+.logview-cbfilter {
+	display: flex;
+	flex-flow: column;
 	flex-wrap: nowrap;
 	margin-top: 10px;
 }
 
-.logview-columns > label {
-	margin-right: 4px;
-	margin-top: 5px;
+.logview-cbfilter > label {
+	margin-right: 6px;
 	align-self: flex-start;
 	white-space: nowrap;
 	flex-basis: 0;
 }
 
-.logview-columns > div {
+.logview-cbfilter > div {
 	display: flex;
 	flex-wrap: wrap;
+	flex-basis: 100%;
+	align-content: flex-start;
 }
 
-.logview-columns > div > div {
+.logview-cbfilter > div > div,
+.logview-cbfilter > div > em {
 	align-items: center;
-	display: flex;
-	flex-flow: row;
+	white-space: nowrap;
 	padding: 2px 6px;
 	margin: 2px 4px 2px 0;
+}
+
+.logview-cbfilter > div > div:last-child {
+	margin-right: 0;
+}
+
+.logview-cbfilter > div > div {
 	border-radius: 5px;
 	border: 1px solid #a6a6a6;
+	opacity: 0.5;
+	user-select: none;
 }
 
-.logview-columns > div > div.column-active {
-	background: #e6e6e6;
+.logview-cbfilter > div > div.cb-active {
+	background-color: #f8f8f8;
+	opacity: 1;
+	box-shadow: 0 1px 3px 0 #aaaaaa;
 }
-
-.logview-columns > div > div > label { padding-left: 4px; margin-left: 0; white-space: nowrap; }
-.logview-columns > div > div > input[type="checkbox"] { height: auto; }
 
 /* Expanded view toggle button */
 .logview > h2 {
 	display: flex;
 	flex-flow: row;
 	justify-content: space-between;
+}
+
+.logview > h2 > a {
 	cursor: pointer;
 }
 
@@ -173,14 +199,16 @@
 
 .logview-controls > div input[type="checkbox"],
 .logview-controls > div label,
-.logview-columns > div > div > input,
-.logview-columns > div > div > label {
+.logview-cbfilter > div > div {
 	cursor: pointer;
 }
 
 .logview-controls > div input[disabled="disabled"],
 .logview-controls > div input[disabled="disabled"] + label,
-.logview-columns > div > div > input[disabled="disabled"],
-.logview-columns > div > div > input[disabled="disabled"] + label {
+.logview-cbfilter > div > div[disabled="disabled"] {
 	cursor: not-allowed;
+}
+
+.logview-cbfilter > div > div[disabled="disabled"] {
+	opacity: 0.65;
 }
