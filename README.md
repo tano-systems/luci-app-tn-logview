@@ -23,8 +23,8 @@ This application requires a installed [Syslog File Converter](https://github.com
 ### Logs View
 ![Logs View](screenshots/luci-app-tn-logview.png?raw=true "Logs View")
 
-### Entries Filter
-![Entries Filter](screenshots/luci-app-tn-logview-filter.png?raw=true "Entries Filter")
+### Filters
+![Filters](screenshots/luci-app-tn-logview-filter.png?raw=true "Filters")
 
 ### Expanded View
 ![Expanded View](screenshots/luci-app-tn-logview-expanded.png?raw=true "Expanded View")
