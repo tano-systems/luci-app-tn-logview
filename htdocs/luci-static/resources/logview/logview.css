@@ -48,8 +48,21 @@
 	color: #000;
 }
 
-/* alert, crit, panic, emerg */
-.lv-p-alert, .lv-p-alert > .td,
+.lv-p-alert > .td ins,
+.lv-p-crit > .td ins,
+.lv-p-panic > .td ins,
+.lv-p-emerg > .td ins {
+	background-color: rgba(0,255,0,0.75) !important;
+}
+
+/* alert */
+.lv-p-alert, .lv-p-alert > .td {
+	color: #ffa500; /* ORANGE on BLACK */
+	font-weight: bold;
+	background-color: rgb(30, 30, 30) !important;
+}
+
+/* crit, panic, emerg */
 .lv-p-crit, .lv-p-crit > .td,
 .lv-p-panic, .lv-p-panic > .td,
 .lv-p-emerg, .lv-p-emerg > .td {
