@@ -49,6 +49,22 @@ return L.view.extend({
 		return logview.load();
 	},
 
+	expandedView: false,
+
+	handleDisplayErrors: function(e) {
+		if (e.name == 'PermissionError') {
+			if (e.message.trim() == 'Exec permission denied') {
+				if (this.expandedView)
+					this.handleExpandedViewToggle(null);
+
+				L.notifySessionExpiry();
+				return;
+			}
+		}
+
+		L.ui.addNotification(null, E('p', e.message), 'error');
+	},
+
 	handleTabActive: function(ev) {
 		var log = this.logs[ev.detail.tab];
 		var target = ev.target;
@@ -60,6 +76,8 @@ return L.view.extend({
 
 			if (log.priorities_filter)
 				this.updatePriorities(log);
+		}, this)).catch(L.bind(function(e) {
+			this.handleDisplayErrors(e);
 		}, this));
 	},
 
@@ -85,6 +103,8 @@ return L.view.extend({
 		return logview.display(log.name, log.filter, true).then(L.bind(function() {
 			if (log.priorities_filter)
 				this.updatePriorities(log);
+		}, this)).catch(L.bind(function(e) {
+			this.handleDisplayErrors(e);
 		}, this));
 	},
 
@@ -97,7 +117,9 @@ return L.view.extend({
 			return logview.display(log.name, log.filter, false).then(L.bind(function() {
 				if (log.priorities_filter)
 					this.updatePriorities(log);
-			}, this));
+			}, this)).catch(L.bind(function(e) {
+			this.handleDisplayErrors(e);
+		}, this));
 		}, this), 250);
 	},
 
@@ -108,6 +130,8 @@ return L.view.extend({
 		logview.display(log.name, log.filter, false).then(L.bind(function() {
 			if (log.priorities_filter)
 				this.updatePriorities(log);
+		}, this)).catch(L.bind(function(e) {
+			this.handleDisplayErrors(e);
 		}, this));
 	},
 
@@ -168,7 +192,9 @@ return L.view.extend({
 			}
 		}
 
-		logview.display(log.name, log.filter, false);
+		logview.display(log.name, log.filter, false).catch(L.bind(function(e) {
+			this.handleDisplayErrors(e);
+		}, this));
 	},
 
 	handleColumnToggle: function(log, column, ev) {
@@ -199,13 +225,16 @@ return L.view.extend({
 			}
 		}
 
-		logview.display(log.name, log.filter, false);
+		logview.display(log.name, log.filter, false).catch(L.bind(function(e) {
+			this.handleDisplayErrors(e);
+		}, this));
 	},
 
-	handleExpandedViewToggle: function(ev) {
-		var view = document.querySelector('div#view');
+	handleExpandedViewToggle: function() {
+		var view = document.querySelector('div#maincontent');
+		var button = view.querySelector('div.logview > h2 > a');
 
-		if (view.style.zIndex == '987654321') {
+		if (this.expandedView) {
 			view.style.width = null;
 			view.style.height = null;
 			view.style.position = null;
@@ -216,20 +245,22 @@ return L.view.extend({
 			view.style.padding = null;
 			view.style.margin = null;
 			view.style.overflowY = null;
-			ev.target.innerHTML = svgExpand;
+			button.innerHTML = svgExpand;
 		} else {
 			view.style.width = '100%';
 			view.style.height = '100%';
 			view.style.position = 'fixed';
-			view.style.zIndex = '987654321';
+			view.style.zIndex = '999999999';
 			view.style.left = '0';
 			view.style.top = '0';
 			view.style.background = '#ffffff';
 			view.style.padding = '0px 16px 0px 16px';
 			view.style.margin = '0';
 			view.style.overflowY = 'scroll';
-			ev.target.innerHTML = svgCompress;
+			button.innerHTML = svgCompress;
 		}
+
+		this.expandedView = !this.expandedView;
 	},
 
 	updatePriorities: function(log) {

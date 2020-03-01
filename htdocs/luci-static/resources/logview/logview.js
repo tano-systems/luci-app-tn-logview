@@ -358,8 +358,6 @@ return L.Class.extend({
 
 		return Promise.resolve(getActionTask(plugin.json_data.action, 'json')).then(function(data) {
 			logviewTableUpdate(plugin, data, filterPattern);
-		}).catch(function(e) {
-			L.ui.addNotification(null, E('p', e.message), 'error');
 		});
 	},
 
