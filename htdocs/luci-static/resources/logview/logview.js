@@ -185,16 +185,16 @@ function logviewTableUpdate(plugin, logData, filterPattern) {
 	plugin.opts.data = logData;
 }
 
-function getActionTask(action, type) {
+function getActionTask(action) {
 	var task = null;
 
 	if (!action)
 		return null;
 
 	if (action.hasOwnProperty('command') && action.command) {
-		task = fs.exec_direct(action.command, action.command_args || [], type);
+		task = fs.exec(action.command, action.command_args || []);
 	} else if (action.hasOwnProperty('file') && action.file) {
-		task = fs.read_direct(action.file, type);
+		task = fs.read(action.file, type);
 	}
 
 	return task;
@@ -356,8 +356,9 @@ return L.Class.extend({
 			])
 		]);
 
-		return Promise.resolve(getActionTask(plugin.json_data.action, 'json')).then(function(data) {
-			logviewTableUpdate(plugin, data, filterPattern);
+		return Promise.resolve(getActionTask(plugin.json_data.action)).then(function(data) {
+			var json = JSON.parse(data.stdout);
+			logviewTableUpdate(plugin, json, filterPattern);
 		});
 	},
 
@@ -383,8 +384,9 @@ return L.Class.extend({
 		else
 			download = plugin.downloads[downloadName];
 
-		return Promise.resolve(getActionTask(download.action, 'blob')).then(function(res) {
-			var url = URL.createObjectURL(new Blob([res], {
+		return Promise.resolve(getActionTask(download.action)).then(function(res) {
+			var data = res.stdout;
+			var url = URL.createObjectURL(new Blob([data], {
 				type: download.mime_type
 			}));
 
