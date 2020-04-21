@@ -2,6 +2,14 @@
 'require ui';
 'require fs';
 'require uci';
+'require rpc';
+
+var callSessionAccess = rpc.declare({
+	object: 'session',
+	method: 'access',
+	params: [ 'scope', 'object', 'function' ],
+	expect: { 'access': false }
+});
 
 var logviewPlugins = {};
 
@@ -217,30 +225,37 @@ return L.Class.extend({
 					continue;
 
 				tasks.push(L.require('logview.plugins.' + m[1]).then(L.bind(function(name, plugin) {
-					if (!plugin.order)
-						plugin.order = 999;
+					if (!plugin.acl)
+						return;
 
-					plugin.opts = {};
-					plugin.name = name;
-					plugin.opts.sortDescending = true;
-					plugin.opts.loaded = false;
-					plugin.opts.data = null;
+					return callSessionAccess('access-group', plugin.acl, 'read').then(L.bind(function(name, plugin, access) {
+						if (!access)
+							return;
 
-					plugin.priorities = {};
+						if (!plugin.order)
+							plugin.order = 999;
 
-					plugin.columns.unshift({
-						name: 'number',
-						display: '№'
-					});
+						plugin.opts = {};
+						plugin.name = name;
+						plugin.opts.sortDescending = true;
+						plugin.opts.loaded = false;
+						plugin.opts.data = null;
 
-					plugin.columns.forEach(function(column, index) {
-						column.index = index;
-						if (!column.hasOwnProperty('show'))
-							column.show = true;
-					});
+						plugin.priorities = {};
 
-					logviewPlugins[name] = plugin;
+						plugin.columns.unshift({
+							name: 'number',
+							display: '№'
+						});
 
+						plugin.columns.forEach(function(column, index) {
+							column.index = index;
+							if (!column.hasOwnProperty('show'))
+								column.show = true;
+						});
+
+						logviewPlugins[name] = plugin;
+					}, this, name, plugin))
 				}, this, m[1])));
 			}
 

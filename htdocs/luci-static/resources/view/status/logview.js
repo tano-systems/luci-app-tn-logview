@@ -303,6 +303,16 @@ return L.view.extend({
 			container.parentNode.removeChild(container.previousElementSibling);
 		}
 
+		if (log_names.length == 0) {
+			container.appendChild(
+				E('div', { 'class': 'alert-message warning' }, [
+					_('No logs available for display. Probably you do not have enough permissions to view the logs.')
+				])
+			);
+
+			return;
+		}
+
 		for (var i = 0; i < log_names.length; i++) {
 			if (!logview.hasPlugin(log_names[i]))
 				continue;
