@@ -5,6 +5,9 @@
 		"action": {
 			"type": "view",
 			"path": "status/logview"
+		},
+		"depends": {
+			"acl": [ "luci-app-tn-logview" ]
 		}
 	}
 }
