@@ -1,51 +1,63 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8"
 
-#: htdocs/luci-static/resources/view/status/logview.js:396
+#: htdocs/luci-static/resources/view/status/logview.js:437
 msgid "Clear"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:380
+#: htdocs/luci-static/resources/view/status/logview.js:421
 msgid "Display columns"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:370
+#: htdocs/luci-static/resources/view/status/logview.js:411
 msgid "Display descending time (latest on top)"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:376
+#: htdocs/luci-static/resources/view/status/logview.js:417
 msgid "Display priorities"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:296
+#: htdocs/luci-static/resources/view/status/logview.js:337
 msgctxt "Download data (action)"
 msgid "Download"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:385
+#: htdocs/luci-static/resources/view/status/logview.js:426
 msgid "Entries filter"
 msgstr ""
 
-#: htdocs/luci-static/resources/logview/plugins/syslog.js:38
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:39
 msgid "Facility"
+msgstr ""
+
+#: root/usr/share/rpcd/acl.d/luci-app-tn-logview.json:3
+msgid "Grant access to logs viewer"
+msgstr ""
+
+#: root/usr/share/rpcd/acl.d/luci-app-tn-logview.json:15
+msgid "Grant access to view kernel log (dmesg)"
+msgstr ""
+
+#: root/usr/share/rpcd/acl.d/luci-app-tn-logview.json:23
+msgid "Grant access to view system log (syslog)"
 msgstr ""
 
 #: htdocs/luci-static/resources/logview/plugins/kernel.js:4
 msgid "Kernel Log"
 msgstr ""
 
-#: htdocs/luci-static/resources/logview/logview.js:355
-#: htdocs/luci-static/resources/view/status/logview.js:82
-#: htdocs/luci-static/resources/view/status/logview.js:320
-#: htdocs/luci-static/resources/view/status/logview.js:377
+#: htdocs/luci-static/resources/logview/logview.js:370
+#: htdocs/luci-static/resources/view/status/logview.js:100
+#: htdocs/luci-static/resources/view/status/logview.js:361
+#: htdocs/luci-static/resources/view/status/logview.js:418
 msgid "Loading data…"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:400
+#: htdocs/luci-static/resources/view/status/logview.js:441
 msgid "Log Entries"
 msgstr ""
 
-#: htdocs/luci-static/resources/logview/logview.js:169
+#: htdocs/luci-static/resources/logview/logview.js:177
 msgid "Log is empty"
 msgstr ""
 
@@ -53,29 +65,35 @@ msgstr ""
 msgid "Logs"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:420
+#: htdocs/luci-static/resources/view/status/logview.js:461
 msgid "Logs View"
 msgstr ""
 
-#: htdocs/luci-static/resources/logview/plugins/kernel.js:37
-#: htdocs/luci-static/resources/logview/plugins/syslog.js:39
+#: htdocs/luci-static/resources/logview/plugins/kernel.js:38
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:40
 msgid "Message"
 msgstr ""
 
-#: htdocs/luci-static/resources/logview/logview.js:173
+#: htdocs/luci-static/resources/logview/logview.js:181
 msgid "No entries matching \"%h\""
 msgstr ""
 
-#: htdocs/luci-static/resources/logview/plugins/kernel.js:36
-#: htdocs/luci-static/resources/logview/plugins/syslog.js:37
+#: htdocs/luci-static/resources/view/status/logview.js:309
+msgid ""
+"No logs available for display. Probably you do not have enough permissions "
+"to view the logs."
+msgstr ""
+
+#: htdocs/luci-static/resources/logview/plugins/kernel.js:37
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:38
 msgid "Priority"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:314
+#: htdocs/luci-static/resources/view/status/logview.js:355
 msgid "Refresh"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:313
+#: htdocs/luci-static/resources/view/status/logview.js:354
 msgid "Reload log contents"
 msgstr ""
 
@@ -83,26 +101,26 @@ msgstr ""
 msgid "System Log"
 msgstr ""
 
-#: htdocs/luci-static/resources/logview/plugins/syslog.js:36
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:37
 msgid "Tag"
 msgstr ""
 
-#: htdocs/luci-static/resources/logview/plugins/kernel.js:35
+#: htdocs/luci-static/resources/logview/plugins/kernel.js:36
 msgid "Time"
 msgstr ""
 
-#: htdocs/luci-static/resources/logview/plugins/syslog.js:35
+#: htdocs/luci-static/resources/logview/plugins/syslog.js:36
 msgid "Timestamp"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:422
+#: htdocs/luci-static/resources/view/status/logview.js:463
 msgid "Toggle expanded view mode"
 msgstr ""
 
-#: htdocs/luci-static/resources/view/status/logview.js:389
+#: htdocs/luci-static/resources/view/status/logview.js:430
 msgid "Type to filter…"
 msgstr ""
 
-#: htdocs/luci-static/resources/logview/logview.js:178
+#: htdocs/luci-static/resources/logview/logview.js:186
 msgid "filtered %d from %d"
 msgstr ""
