@@ -374,11 +374,11 @@ return L.Class.extend({
 		var plugin = logviewPlugins[logName];
 
 		if (!plugin || !plugin.opts.target)
-			return Promise.resolve(null);
+			return Promise.resolve(false);
 
 		if (!forceReload && plugin.opts.loaded) {
 			logviewTableUpdate(plugin, plugin.opts.data, filterPattern);
-			return Promise.resolve(null);
+			return Promise.resolve(plugin.opts.load_error ? false : true);
 		}
 
 		L.dom.content(plugin.opts.target, [
@@ -414,6 +414,7 @@ return L.Class.extend({
 			}
 
 			logviewTableUpdate(plugin, json, filterPattern);
+			return Promise.resolve(plugin.opts.load_error ? false : true);
 		});
 	},
 

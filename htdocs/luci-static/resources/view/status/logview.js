@@ -45,11 +45,12 @@ const svgCompress =
 
 return L.view.extend({
 	load: function() {
-		this.logs = {};
 		return logview.load();
 	},
 
 	expandedView: false,
+	logs: {},
+	controls: {},
 
 	handleDisplayErrors: function(e) {
 		if (e.name == 'PermissionError') {
@@ -65,15 +66,32 @@ return L.view.extend({
 		L.ui.addNotification(null, E('p', e.message), 'error');
 	},
 
+	updateControls: function(log_name, loaded) {
+		if (!this.controls.hasOwnProperty(log_name))
+			return;
+
+		var controls = this.controls[log_name];
+
+		controls.querySelectorAll('.cbi-button, input[type="checkbox"]').forEach(function(e) {
+			e.setAttribute('disabled', 'disabled');
+		});
+
+		if (loaded) {
+			controls.querySelectorAll('.cbi-button, input[type="checkbox"]').forEach(function(e) {
+				e.removeAttribute('disabled');
+			});
+		} else {
+			controls.querySelector('.logview-btn-refresh')
+				.removeAttribute('disabled');
+		};
+	},
+
 	handleTabActive: function(ev) {
 		var log = this.logs[ev.detail.tab];
 		var target = ev.target;
 
-		return logview.display(log.name, log.filter, false).then(L.bind(function() {
-			target.querySelectorAll('.cbi-button, input[type="checkbox"]').forEach(function(e) {
-				e.removeAttribute('disabled');
-			});
-
+		return logview.display(log.name, log.filter, false).then(L.bind(function(loaded) {
+			this.updateControls(log.name, loaded);
 			if (log.priorities_filter)
 				this.updatePriorities(log);
 		}, this)).catch(L.bind(function(e) {
@@ -100,7 +118,8 @@ return L.view.extend({
 			L.dom.content(node, E('em', { 'class': 'spinning' }, _('Loading data…')));
 		}
 
-		return logview.display(log.name, log.filter, true).then(L.bind(function() {
+		return logview.display(log.name, log.filter, true).then(L.bind(function(loaded) {
+			this.updateControls(log.name, loaded);
 			if (log.priorities_filter)
 				this.updatePriorities(log);
 		}, this)).catch(L.bind(function(e) {
@@ -335,7 +354,8 @@ return L.view.extend({
 
 				downloads.choices[dl.name] = '%s (%s)'.format(
 					_('Download', 'Download data (action)'), dl.display);
-				downloads.options.classes[dl.name] = 'cbi-button cbi-button-action';
+				downloads.options.classes[dl.name] =
+					'cbi-button cbi-button-action logview-btn-download';
 			});
 
 			var downloadsButton = new ui.ComboButton(
@@ -348,7 +368,7 @@ return L.view.extend({
 
 			var buttons = [
 				E('button', {
-					'class': 'cbi-button cbi-button-action',
+					'class': 'cbi-button cbi-button-action logview-btn-refresh',
 					'click': ui.createHandlerFn(this, 'handleRefresh', log),
 					'disabled': 'disabled',
 					'title': _('Reload log contents')
@@ -392,26 +412,28 @@ return L.view.extend({
 				log.priorities_total = 0;
 			}
 
+			this.controls[log.name] = E('div', { 'class': 'cbi-section logview-controls' }, [
+				E('div', {}, [
+					E('input', {
+						'type': 'checkbox',
+						'id': 'sorting-toggle-' + log.name,
+						'name': 'sorting-toggle-' + log.name,
+						'checked': 'checked',
+						'disabled': 'disabled',
+						'click': L.bind(this.handleSortingToggle, this, log)
+					}),
+					E('label', { 'for': 'sorting-toggle-' + log.name },
+						_('Display descending time (latest on top)'))
+				]),
+				E('div', {}, buttons)
+			]);
+
 			container.appendChild(E('div', {
 				'data-tab': log_names[i],
 				'data-tab-title': logview.logTitle(log.name),
 				'cbi-tab-active': L.bind(this.handleTabActive, this)
 			}, [
-				E('div', { 'class': 'cbi-section logview-controls' }, [
-					E('div', {}, [
-						E('input', {
-							'type': 'checkbox',
-							'id': 'sorting-toggle-' + log.name,
-							'name': 'sorting-toggle-' + log.name,
-							'checked': 'checked',
-							'disabled': 'disabled',
-							'click': L.bind(this.handleSortingToggle, this, log)
-						}),
-						E('label', { 'for': 'sorting-toggle-' + log.name },
-							_('Display descending time (latest on top)'))
-					]),
-					E('div', {}, buttons)
-				]),
+				this.controls[log.name],
 				E('div', { 'class': 'logview-cbfitlers-container' }, [
 					log.priorities_filter ? E('div', { 'class': 'cbi-section logview-cbfilter logview-priorities' }, [
 						E('label', {}, _('Display priorities') + ':'),
