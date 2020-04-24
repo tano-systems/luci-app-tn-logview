@@ -157,29 +157,44 @@ function logviewTableUpdate(plugin, logData, filterPattern) {
 
 	var rows_filtered = 0;
 	var row = 1;
-	var rows_total = logData.length;
+	var rows_total = Array.isArray(logData) ? logData.length : 0;
 
 	/* Clear all priorities count */
 	Object.keys(plugin.priorities).forEach(function(priority) {
 		plugin.priorities[priority].count = 0;
 	});
 
-	logData.forEach(function(line) {
-		line.number = (row++).toString();
-		rows_filtered += logviewTableAddRow(
-			plugin, table, line, plugin.columns, filterPattern);
-	});
+	if (rows_total > 0) {
+		logData.forEach(function(line) {
+			line.number = (row++).toString();
+			rows_filtered += logviewTableAddRow(
+				plugin, table, line, plugin.columns, filterPattern);
+		});
+	}
 
 	var info = document.querySelector('#logview-count-info-' + plugin.name);
 
-	if (!rows_total) {
+	if (plugin.opts.load_error) {
 		table.appendChild(E('div', { 'class': 'tr placeholder' }, [
-			E('div', { 'class': 'td' }, _('Log is empty'))
+			E('div', { 'class': 'td left' }, [
+				E('p', { 'class': 'alert-message error' }, [
+					_('Failed to load log (error code %d)').format(plugin.opts.load_error.code),
+					plugin.opts.load_error.stdout ? E('pre', {}, plugin.opts.load_error.stdout) : '',
+					plugin.opts.load_error.stderr ? E('pre', {}, plugin.opts.load_error.stderr) : ''
+				])
+			])
 		]));
-	} else if (!rows_filtered && filterPattern) {
-		table.appendChild(E('div', { 'class': 'tr placeholder' }, [
-			E('div', { 'class': 'td' }, _('No entries matching \"%h\"').format(filterPattern))
-		]));
+	}
+	else {
+		if (!rows_total) {
+			table.appendChild(E('div', { 'class': 'tr placeholder' }, [
+				E('div', { 'class': 'td' }, _('Log is empty'))
+			]));
+		} else if (!rows_filtered && filterPattern) {
+			table.appendChild(E('div', { 'class': 'tr placeholder' }, [
+				E('div', { 'class': 'td' }, _('No entries matching \"%h\"').format(filterPattern))
+			]));
+		}
 	}
 
 	if (rows_total && (rows_filtered != rows_total)) {
@@ -240,6 +255,7 @@ return L.Class.extend({
 						plugin.opts.sortDescending = true;
 						plugin.opts.loaded = false;
 						plugin.opts.data = null;
+						plugin.opts.load_error = null;
 
 						plugin.priorities = {};
 
@@ -372,7 +388,31 @@ return L.Class.extend({
 		]);
 
 		return Promise.resolve(getActionTask(plugin.json_data.action)).then(function(data) {
-			var json = JSON.parse(data.stdout);
+			var json;
+
+			if (data.code == 0) {
+				try {
+					var json = JSON.parse(data.stdout);
+					plugin.opts.load_error = null;
+				}
+				catch(e) {
+					plugin.opts.load_error = {
+						code: 0,
+						stderr: _('Failed to parse JSON')
+					};
+
+					json = [];
+				};
+			}
+			else {
+				json = [];
+				plugin.opts.load_error = {
+					code: data.code,
+					stdout: data.stdout,
+					stderr: data.stderr
+				};
+			}
+
 			logviewTableUpdate(plugin, json, filterPattern);
 		});
 	},
