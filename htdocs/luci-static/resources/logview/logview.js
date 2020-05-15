@@ -67,12 +67,9 @@ function logviewTableCreate(e, columns) {
 }
 
 function logviewTableAddRow(plugin, table, data, columns, filterPattern) {
-	var priority = data.hasOwnProperty('priority') ? data.priority.trim() : 'none';
+	var priority = 'none';
 
-	if (priority == '')
-		priority = 'none';
-
-	var r = E('div', { 'class': 'tr lv-p-' + priority }, []);
+	var r = E('div', { 'class': 'tr' }, []);
 	var filterMatch = true;
 
 	if (typeof(filterPattern) === 'string' && filterPattern.length > 0) {
@@ -82,14 +79,15 @@ function logviewTableAddRow(plugin, table, data, columns, filterPattern) {
 
 	for (var i = 0; i < columns.length; i++) {
 		var cell_data = '';
-		var key = columns[i].name;
+		var name = columns[i].name
+		var key = columns[i].field || name;
 
 		if (!columns[i].show)
 			continue;
 
 		if (data.hasOwnProperty(key)) {
-			if (key == 'timestamp') {
-				var date = new Date(parseInt(data.timestamp) * 1000);
+			if (name == 'timestamp') {
+				var date = new Date(parseInt(columns[i].modfunc(data.timestamp)) * 1000);
 
 				var ts = '%02d.%02d.%04d %02d:%02d:%02d'.format(
 					date.getDate(),
@@ -102,12 +100,15 @@ function logviewTableAddRow(plugin, table, data, columns, filterPattern) {
 
 				cell_data = ts;
 			}
-			else if (key == 'priority') {
-				cell_data = priorityDisplay.hasOwnProperty(data[key])
-					? priorityDisplay[data[key]] : data[key];
+			else if (name == 'priority') {
+				var d = columns[i].modfunc(data[key]).trim();
+				cell_data = priorityDisplay.hasOwnProperty(d)
+					? priorityDisplay[d] : d;
+
+				priority = d;
 			}
 			else {
-				cell_data = data[key];
+				cell_data = columns[i].modfunc(data[key]);
 			}
 
 			if (filterPattern instanceof RegExp) {
@@ -120,8 +121,14 @@ function logviewTableAddRow(plugin, table, data, columns, filterPattern) {
 			}
 		}
 
-		r.appendChild(E('div', { 'class': 'td top lf-' + key }, [ cell_data ]));
+		r.appendChild(E('div', { 'class': 'td top lf-' + name }, [
+			columns[i].nobr
+				? E('nobr', {}, cell_data)
+				: cell_data
+		]));
 	}
+
+	r.classList.add('lv-p-' + priority);
 
 	if (!filterMatch)
 		return 0;
@@ -268,6 +275,9 @@ return L.Class.extend({
 							column.index = index;
 							if (!column.hasOwnProperty('show'))
 								column.show = true;
+
+							if (!column.modfunc)
+								column.modfunc = function(v) { return v; };
 						});
 
 						logviewPlugins[name] = plugin;
