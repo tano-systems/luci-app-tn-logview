@@ -92,6 +92,7 @@ return L.view.extend({
 
 		return logview.display(log.name, log.filter, false).then(L.bind(function(loaded) {
 			this.updateControls(log.name, loaded);
+			this.updateColumns(log);
 			if (log.priorities_filter)
 				this.updatePriorities(log);
 		}, this)).catch(L.bind(function(e) {
@@ -118,8 +119,13 @@ return L.view.extend({
 			L.dom.content(node, E('em', { 'class': 'spinning' }, _('Loading data…')));
 		}
 
+		/* Add spinner to columns filter */
+		var node = document.querySelector('div[data-tab="' + log.name + '"] div.logview-columns > div');
+		L.dom.content(node, E('em', { 'class': 'spinning' }, _('Loading data…')));
+
 		return logview.display(log.name, log.filter, true).then(L.bind(function(loaded) {
 			this.updateControls(log.name, loaded);
+			this.updateColumns(log);
 			if (log.priorities_filter)
 				this.updatePriorities(log);
 		}, this)).catch(L.bind(function(e) {
@@ -134,6 +140,7 @@ return L.view.extend({
 		keyTimeout = window.setTimeout(L.bind(function() {
 			log.filter = ev.target.value;
 			return logview.display(log.name, log.filter, false).then(L.bind(function() {
+				this.updateColumns(log);
 				if (log.priorities_filter)
 					this.updatePriorities(log);
 			}, this)).catch(L.bind(function(e) {
@@ -147,6 +154,7 @@ return L.view.extend({
 		var filterEl = document.querySelector('div[data-tab="' + log.name + '"] input[name="filter"]');
 		filterEl.value = log.filter;
 		logview.display(log.name, log.filter, false).then(L.bind(function() {
+			this.updateColumns(log);
 			if (log.priorities_filter)
 				this.updatePriorities(log);
 		}, this)).catch(L.bind(function(e) {
@@ -282,6 +290,32 @@ return L.view.extend({
 		this.expandedView = !this.expandedView;
 	},
 
+	updateColumns: function(log) {
+		var columns = logview.logColumns(log.name);
+		log.columns_visible = 0;
+
+		var logviewColumns = [];
+		columns.forEach(L.bind(function(column) {
+			if (column.empty)
+				return;
+
+			if (column.show)
+				log.columns_visible++;
+
+			logviewColumns.push(
+				E('div', {
+					'class': column.show ? 'cb-active' : '',
+					'data-hide': column.show ? false : true,
+					'click': ui.createHandlerFn(this, 'handleColumnToggle', log, column)
+				}, [ column.display ])
+			);
+		}, this));
+
+		/* div[data-tab="..." .logview-priorities > div > ... */
+		var node = document.querySelector('div[data-tab="' + log.name + '"] div.logview-columns > div');
+		L.dom.content(node, logviewColumns);
+	},
+
 	updatePriorities: function(log) {
 		if (!log.priorities_filter)
 			return;
@@ -383,29 +417,15 @@ return L.view.extend({
 			]);
 
 			log.target = logviewTable;
-			log.columns = logview.logColumns(log.name);
-			log.columns_visible = 0;
 			log.priorities_filter = false;
 			log.filter = '';
 
 			logview.setTarget(log.name, log.target);
 
-			var logviewColumns = [];
-			log.columns.forEach(L.bind(function(column) {
-				if (column.show)
-					log.columns_visible++;
-
+			logview.logColumns(log.name).forEach(function(column) {
 				if (column.name == 'priority')
 					log.priorities_filter = true;
-
-				logviewColumns.push(
-					E('div', {
-						'class': column.show ? 'cb-active' : '',
-						'data-hide': column.show ? false : true,
-						'click': ui.createHandlerFn(this, 'handleColumnToggle', log, column)
-					}, [ column.display ])
-				);
-			}, this));
+			});
 
 			if (log.priorities_filter) {
 				log.priorities_visible = 0;
@@ -441,7 +461,7 @@ return L.view.extend({
 					]) : '',
 					E('div', { 'class': 'cbi-section logview-cbfilter logview-columns' }, [
 						E('label', {}, _('Display columns') + ':'),
-						E('div', {}, logviewColumns)
+						E('div', {}, E('em', { 'class': 'spinning' }, _('Loading data…')))
 					])
 				]),
 				E('div', { 'class': 'cbi-section logview-filter' }, [

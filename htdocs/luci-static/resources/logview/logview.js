@@ -50,7 +50,7 @@ function logviewTableCreate(e, columns) {
 	var tr = E('div', { 'class': 'tr table-titles' });
 
 	columns.forEach(function(column) {
-		if (!column.show)
+		if (!column.show || column.empty)
 			return;
 
 		tr.appendChild(E('div', { 'class': 'th top lf-' + column.name }, [
@@ -82,7 +82,7 @@ function logviewTableAddRow(plugin, table, data, columns, filterPattern) {
 		var name = columns[i].name
 		var key = columns[i].field || name;
 
-		if (!columns[i].show)
+		if (!columns[i].show || columns[i].empty)
 			continue;
 
 		if (data.hasOwnProperty(key)) {
@@ -159,9 +159,6 @@ function logviewTableAddRow(plugin, table, data, columns, filterPattern) {
 }
 
 function logviewTableUpdate(plugin, logData, filterPattern) {
-	var tableContainer = E('div', {});
-	var table = logviewTableCreate(tableContainer, plugin.columns);
-
 	var rows_filtered = 0;
 	var row = 1;
 	var rows_total = Array.isArray(logData) ? logData.length : 0;
@@ -170,6 +167,27 @@ function logviewTableUpdate(plugin, logData, filterPattern) {
 	Object.keys(plugin.priorities).forEach(function(priority) {
 		plugin.priorities[priority].count = 0;
 	});
+
+	if (rows_total > 0) {
+		/* column with index 0 is '№' (displayed always) */
+		for (let i = 1; i < plugin.columns.length; i++) {
+			plugin.columns[i].empty = true;
+		}
+
+		logData.forEach(function(line) {
+			for (let i = 1; i < plugin.columns.length; i++) {
+				if (!plugin.columns[i].empty)
+					continue;
+
+				var key = plugin.columns[i].field || plugin.columns[i].name;
+				if (line.hasOwnProperty(key) && line[key] !== '')
+					plugin.columns[i].empty = false;
+			}
+		});
+	}
+
+	var tableContainer = E('div', {});
+	var table = logviewTableCreate(tableContainer, plugin.columns);
 
 	if (rows_total > 0) {
 		logData.forEach(function(line) {
@@ -278,6 +296,8 @@ return L.Class.extend({
 
 							if (!column.modfunc)
 								column.modfunc = function(v) { return v; };
+
+							column.empty = false;
 						});
 
 						logviewPlugins[name] = plugin;
