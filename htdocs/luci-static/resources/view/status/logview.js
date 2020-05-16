@@ -255,6 +255,7 @@ return L.view.extend({
 
 	handleExpandedViewToggle: function() {
 		var view = document.querySelector('div#maincontent');
+		var footer = document.querySelector('.footer');
 		var button = view.querySelector('div.logview > h2 > a');
 
 		if (this.expandedView) {
@@ -269,6 +270,9 @@ return L.view.extend({
 			view.style.margin = null;
 			view.style.overflowY = null;
 			button.innerHTML = svgExpand;
+
+			if (footer)
+				footer.style.display = null;
 		} else {
 			view.style.width = '100%';
 			view.style.height = '100%';
@@ -281,6 +285,9 @@ return L.view.extend({
 			view.style.margin = '0';
 			view.style.overflowY = 'scroll';
 			button.innerHTML = svgCompress;
+
+			if (footer)
+				footer.style.display = 'none';
 		}
 
 		this.expandedView = !this.expandedView;
@@ -498,23 +505,33 @@ return L.view.extend({
 	},
 
 	handleTableHeight: function() {
+		var mc     = document.querySelector('.main-content');
 		var view   = document.querySelector('div#maincontent');
-		var footer = view.querySelector('div.footer');
 		var tables = view.querySelectorAll('.logview-table .table-wrapper');
 
 		var windowHeight = window.innerHeight;
 		var footerHeight = 0;
 
-		if (footer) {
-			var footerStyle = footer.currentStyle || window.getComputedStyle(footer);
-			var footerHeight = parseInt(footerStyle.height, 10) +
-			                   parseInt(footerStyle.marginTop, 10) +
-			                   parseInt(footerStyle.marginBottom, 10);
+		if (!this.expandedView) {
+			var footer = document.querySelector('div.footer');
+			if (footer) {
+				var footerStyle = footer.currentStyle || window.getComputedStyle(footer);
+				footerHeight = parseInt(footerStyle.height, 10) +
+				               parseInt(footerStyle.marginTop, 10) +
+				               parseInt(footerStyle.marginBottom, 10);
+			}
 		}
+
+		var mcStyle = mc.currentStyle || window.getComputedStyle(mc);
 
 		tables.forEach(function(table) {
 			var tableRect = table.getBoundingClientRect();
-			table.style.height = (windowHeight - tableRect.top - footerHeight) + 'px';
+			var padding = parseInt(mcStyle.paddingBottom, 10);
+
+			if (!footerHeight && !padding)
+				padding = 16;
+
+			table.style.height = (windowHeight - tableRect.top - padding - footerHeight) + 'px';
 		});
 	},
 
