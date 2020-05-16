@@ -82,6 +82,10 @@ function logviewTableAddRow(plugin, table, data, columns, filterPattern) {
 		var name = columns[i].name
 		var key = columns[i].field || name;
 
+		if ((name == 'priority') && data.hasOwnProperty(key)) {
+			priority = columns[i].modfunc(data[key]).trim();
+		}
+
 		if (!columns[i].show || columns[i].empty)
 			continue;
 
@@ -101,11 +105,8 @@ function logviewTableAddRow(plugin, table, data, columns, filterPattern) {
 				cell_data = ts;
 			}
 			else if (name == 'priority') {
-				var d = columns[i].modfunc(data[key]).trim();
-				cell_data = priorityDisplay.hasOwnProperty(d)
-					? priorityDisplay[d] : d;
-
-				priority = d;
+				cell_data = priorityDisplay.hasOwnProperty(priority)
+					? priorityDisplay[priority] : priority;
 			}
 			else {
 				cell_data = columns[i].modfunc(data[key]);
