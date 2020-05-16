@@ -58,7 +58,12 @@ function logviewTableCreate(e, columns) {
 		]));
 	});
 
-	var table = E('div', { 'class': 'table-wrapper' }, [
+	var table = E('div', {
+		'class': 'table-wrapper',
+		'style': 'overflow-x: auto; ' +
+		         'overflow-y: auto; ' +
+		         'min-height: 400px;'
+	}, [
 		E('div', { 'class': 'table' }, tr)
 	]);
 

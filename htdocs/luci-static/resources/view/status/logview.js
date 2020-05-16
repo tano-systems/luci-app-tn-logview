@@ -92,9 +92,7 @@ return L.view.extend({
 
 		return logview.display(log.name, log.filter, false).then(L.bind(function(loaded) {
 			this.updateControls(log.name, loaded);
-			this.updateColumns(log);
-			if (log.priorities_filter)
-				this.updatePriorities(log);
+			this.update(log);
 		}, this)).catch(L.bind(function(e) {
 			this.handleDisplayErrors(e);
 		}, this));
@@ -125,9 +123,7 @@ return L.view.extend({
 
 		return logview.display(log.name, log.filter, true).then(L.bind(function(loaded) {
 			this.updateControls(log.name, loaded);
-			this.updateColumns(log);
-			if (log.priorities_filter)
-				this.updatePriorities(log);
+			this.update(log);
 		}, this)).catch(L.bind(function(e) {
 			this.handleDisplayErrors(e);
 		}, this));
@@ -140,9 +136,7 @@ return L.view.extend({
 		keyTimeout = window.setTimeout(L.bind(function() {
 			log.filter = ev.target.value;
 			return logview.display(log.name, log.filter, false).then(L.bind(function() {
-				this.updateColumns(log);
-				if (log.priorities_filter)
-					this.updatePriorities(log);
+				this.update(log);
 			}, this)).catch(L.bind(function(e) {
 			this.handleDisplayErrors(e);
 		}, this));
@@ -154,9 +148,7 @@ return L.view.extend({
 		var filterEl = document.querySelector('div[data-tab="' + log.name + '"] input[name="filter"]');
 		filterEl.value = log.filter;
 		logview.display(log.name, log.filter, false).then(L.bind(function() {
-			this.updateColumns(log);
-			if (log.priorities_filter)
-				this.updatePriorities(log);
+			this.update(log);
 		}, this)).catch(L.bind(function(e) {
 			this.handleDisplayErrors(e);
 		}, this));
@@ -219,7 +211,9 @@ return L.view.extend({
 			}
 		}
 
-		logview.display(log.name, log.filter, false).catch(L.bind(function(e) {
+		logview.display(log.name, log.filter, false).then(L.bind(function() {
+			this.update(log);
+		}, this)).catch(L.bind(function(e) {
 			this.handleDisplayErrors(e);
 		}, this));
 	},
@@ -252,7 +246,9 @@ return L.view.extend({
 			}
 		}
 
-		logview.display(log.name, log.filter, false).catch(L.bind(function(e) {
+		logview.display(log.name, log.filter, false).then(L.bind(function() {
+			this.update(log);
+		}, this)).catch(L.bind(function(e) {
 			this.handleDisplayErrors(e);
 		}, this));
 	},
@@ -288,6 +284,14 @@ return L.view.extend({
 		}
 
 		this.expandedView = !this.expandedView;
+		this.handleTableHeight();
+	},
+
+	update: function(log) {
+		this.updateColumns(log);
+		if (log.priorities_filter)
+			this.updatePriorities(log);
+		this.handleTableHeight();
 	},
 
 	updateColumns: function(log) {
@@ -493,6 +497,27 @@ return L.view.extend({
 		ui.tabs.initTabGroup(container.childNodes);
 	},
 
+	handleTableHeight: function() {
+		var view   = document.querySelector('div#maincontent');
+		var footer = view.querySelector('div.footer');
+		var tables = view.querySelectorAll('.logview-table .table-wrapper');
+
+		var windowHeight = window.innerHeight;
+		var footerHeight = 0;
+
+		if (footer) {
+			var footerStyle = footer.currentStyle || window.getComputedStyle(footer);
+			var footerHeight = parseInt(footerStyle.height, 10) +
+			                   parseInt(footerStyle.marginTop, 10) +
+			                   parseInt(footerStyle.marginBottom, 10);
+		}
+
+		tables.forEach(function(table) {
+			var tableRect = table.getBoundingClientRect();
+			table.style.height = (windowHeight - tableRect.top - footerHeight) + 'px';
+		});
+	},
+
 	render: function() {
 		var logTabs = E('div', { 'data-name': 'logs' });
 
@@ -509,6 +534,8 @@ return L.view.extend({
 				logTabs
 			])
 		]);
+
+		window.addEventListener('resize', this.handleTableHeight);
 
 		this.renderTabs(logTabs);
 		return view;
