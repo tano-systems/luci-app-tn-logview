@@ -458,7 +458,7 @@ return L.view.extend({
 					log.priorities_filter ? E('div', { 'class': 'cbi-section logview-cbfilter logview-priorities' }, [
 						E('label', {}, _('Display priorities') + ':'),
 						E('div', {}, E('em', { 'class': 'spinning' }, _('Loading data…')))
-					]) : '',
+					]) : E('div', {}),
 					E('div', { 'class': 'cbi-section logview-cbfilter logview-columns' }, [
 						E('label', {}, _('Display columns') + ':'),
 						E('div', {}, E('em', { 'class': 'spinning' }, _('Loading data…')))

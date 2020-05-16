@@ -166,6 +166,16 @@
 	align-content: flex-start;
 }
 
+.logview-cbfilter.logview-columns > label {
+	align-self: flex-end;
+	margin-left: 6px;
+	margin-right: 0;
+}
+
+.logview-cbfilter.logview-columns > div {
+	justify-content: flex-end;
+}
+
 .logview-cbfilter > div > div,
 .logview-cbfilter > div > em {
 	align-items: center;
@@ -176,6 +186,12 @@
 
 .logview-cbfilter > div > div:last-child {
 	margin-right: 0;
+	margin-left: 0;
+}
+
+.logview-cbfilter.logview-columns > div > div,
+.logview-cbfilter.logview-columns > div > em {
+	margin: 2px 0 2px 4px;
 }
 
 .logview-cbfilter > div > div {
