@@ -246,9 +246,9 @@ function getActionTask(action) {
 		return null;
 
 	if (action.hasOwnProperty('command') && action.command) {
-		task = fs.exec(action.command, action.command_args || []);
+		task = fs.exec_direct(action.command, action.command_args || []);
 	} else if (action.hasOwnProperty('file') && action.file) {
-		task = fs.read(action.file, type);
+		task = fs.read_direct(action.file, type);
 	}
 
 	return task;
@@ -426,9 +426,9 @@ return L.Class.extend({
 		return Promise.resolve(getActionTask(plugin.json_data.action)).then(function(data) {
 			var json;
 
-			if (data.code == 0) {
+			if (data) {
 				try {
-					var json = JSON.parse(data.stdout);
+					var json = JSON.parse(data);
 					plugin.opts.load_error = null;
 				}
 				catch(e) {
@@ -443,9 +443,9 @@ return L.Class.extend({
 			else {
 				json = [];
 				plugin.opts.load_error = {
-					code: data.code,
-					stdout: data.stdout,
-					stderr: data.stderr
+					code: -1,
+					stdout: '',
+					stderr: _('No data')
 				};
 			}
 
@@ -477,8 +477,7 @@ return L.Class.extend({
 			download = plugin.downloads[downloadName];
 
 		return Promise.resolve(getActionTask(download.action)).then(function(res) {
-			var data = res.stdout;
-			var url = URL.createObjectURL(new Blob([data], {
+			var url = URL.createObjectURL(new Blob([res], {
 				type: download.mime_type
 			}));
 
