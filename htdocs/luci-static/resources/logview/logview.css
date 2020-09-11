@@ -131,39 +131,43 @@
 	margin: 0 0 0 6px !important;
 }
 
-.logview-cbfitlers-container {
+.logview-cbfilters-container {
 	display: flex;
 	flex-flow: row;
+	-ms-flex-flow: row;
 	justify-content: space-between;
+	width: 100%;
+	flex-wrap: wrap;
 }
 
-.logview-cbfitlers-container > div {
+.logview-cbfilters-container > div {
 	margin-right: 12px;
 }
 
-.logview-cbfitlers-container > div:last-child {
+.logview-cbfilters-container > div:last-child {
 	margin-right: 0;
 }
 
 .logview-cbfilter {
-	display: flex;
-	flex-flow: column;
-	flex-wrap: nowrap;
+	display: block;
 	margin-top: 10px;
+	width: 100%;
 }
 
 .logview-cbfilter > label {
+	width: 100%;
 	margin-right: 6px;
-	align-self: flex-start;
-	white-space: nowrap;
-	flex-basis: 0;
 }
 
 .logview-cbfilter > div {
+	display: -webkit-flex;
+	display: -ms-flexbox;
 	display: flex;
+	-ms-flex-flow: row wrap;
 	flex-wrap: wrap;
-	flex-basis: 100%;
+	-ms-flex-pack: left;
 	align-content: flex-start;
+	width: 100%;
 }
 
 .logview-cbfilter.logview-columns > label {

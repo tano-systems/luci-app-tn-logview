@@ -465,7 +465,7 @@ return L.view.extend({
 				'cbi-tab-active': L.bind(this.handleTabActive, this)
 			}, [
 				this.controls[log.name],
-				E('div', { 'class': 'logview-cbfitlers-container' }, [
+				E('div', { 'class': 'logview-cbfilters-container' }, [
 					log.priorities_filter ? E('div', { 'class': 'cbi-section logview-cbfilter logview-priorities' }, [
 						E('label', {}, _('Display priorities') + ':'),
 						E('div', {}, E('em', { 'class': 'spinning' }, _('Loading data…')))
