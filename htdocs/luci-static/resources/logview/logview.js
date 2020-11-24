@@ -424,28 +424,31 @@ return L.Class.extend({
 		]);
 
 		return Promise.resolve(getActionTask(plugin.json_data.action)).then(function(data) {
-			var json;
+			var json = [];
 
-			if (data) {
-				try {
-					var json = JSON.parse(data);
-					plugin.opts.load_error = null;
-				}
-				catch(e) {
-					plugin.opts.load_error = {
-						code: 0,
-						stderr: _('Failed to parse JSON')
+			if (typeof data === 'string') {
+				if (data.length > 0)
+				{
+					try {
+						var json = JSON.parse(data);
+						plugin.opts.load_error = null;
+					}
+					catch(e) {
+						plugin.opts.load_error = {
+							code: 0,
+							stderr: _('Failed to parse JSON')
+						};
+
+						json = [];
 					};
-
-					json = [];
-				};
+				}
 			}
 			else {
 				json = [];
 				plugin.opts.load_error = {
 					code: -1,
 					stdout: '',
-					stderr: _('No data')
+					stderr: _('Invalid data')
 				};
 			}
 
