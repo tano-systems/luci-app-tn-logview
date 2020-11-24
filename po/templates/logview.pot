@@ -34,7 +34,7 @@ msgstr ""
 msgid "Failed to load log (error code %d)"
 msgstr ""
 
-#: htdocs/luci-static/resources/logview/logview.js:437
+#: htdocs/luci-static/resources/logview/logview.js:439
 msgid "Failed to parse JSON"
 msgstr ""
 
@@ -48,6 +48,10 @@ msgstr ""
 
 #: root/usr/share/rpcd/acl.d/luci-app-tn-logview.json:23
 msgid "Grant access to view system log (syslog)"
+msgstr ""
+
+#: htdocs/luci-static/resources/logview/logview.js:451
+msgid "Invalid data"
 msgstr ""
 
 #: htdocs/luci-static/resources/logview/plugins/kernel.js:4
@@ -82,10 +86,6 @@ msgstr ""
 #: htdocs/luci-static/resources/logview/plugins/kernel.js:38
 #: htdocs/luci-static/resources/logview/plugins/syslog.js:40
 msgid "Message"
-msgstr ""
-
-#: htdocs/luci-static/resources/logview/logview.js:448
-msgid "No data"
 msgstr ""
 
 #: htdocs/luci-static/resources/logview/logview.js:226

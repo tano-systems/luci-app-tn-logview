@@ -3,13 +3,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Project-Id-Version: luci-app-tn-logview\n"
 "POT-Creation-Date: 2020-02-24 06:07+0300\n"
-"PO-Revision-Date: 2020-07-26 20:43+0300\n"
+"PO-Revision-Date: 2020-11-24 19:21+0300\n"
 "Last-Translator: Anton Kikin <a.kikin@tano-systems.com>\n"
 "Language-Team: Tano Systems LLC\n"
 "MIME-Version: 1.0\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
-"X-Generator: Poedit 2.2\n"
+"X-Generator: Poedit 2.3\n"
 
 #: htdocs/luci-static/resources/view/status/logview.js:490
 msgid "Clear"
@@ -42,11 +42,11 @@ msgstr "Категория"
 
 #: htdocs/luci-static/resources/logview/logview.js:212
 msgid "Failed to load log (error code %d)"
-msgstr ""
+msgstr "Не удалось загрузить журнал (код ошибки %d)"
 
-#: htdocs/luci-static/resources/logview/logview.js:437
+#: htdocs/luci-static/resources/logview/logview.js:439
 msgid "Failed to parse JSON"
-msgstr ""
+msgstr "Не удалось выполнить разбор JSON"
 
 #: root/usr/share/rpcd/acl.d/luci-app-tn-logview.json:3
 msgid "Grant access to logs viewer"
@@ -59,6 +59,10 @@ msgstr "Предоставить доступ к просмотру журнал
 #: root/usr/share/rpcd/acl.d/luci-app-tn-logview.json:23
 msgid "Grant access to view system log (syslog)"
 msgstr "Предоставить доступ к просмотру системного журнала (syslog)"
+
+#: htdocs/luci-static/resources/logview/logview.js:451
+msgid "Invalid data"
+msgstr "Неверные данные"
 
 #: htdocs/luci-static/resources/logview/plugins/kernel.js:4
 msgid "Kernel Log"
@@ -93,10 +97,6 @@ msgstr "Просмотр журналов"
 #: htdocs/luci-static/resources/logview/plugins/syslog.js:40
 msgid "Message"
 msgstr "Сообщение"
-
-#: htdocs/luci-static/resources/logview/logview.js:448
-msgid "No data"
-msgstr "Нет данных"
 
 #: htdocs/luci-static/resources/logview/logview.js:226
 msgid "No entries matching \"%h\""
