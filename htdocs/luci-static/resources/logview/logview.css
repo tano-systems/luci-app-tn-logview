@@ -172,7 +172,7 @@
 
 .logview-cbfilter.logview-columns > label {
 	align-self: flex-end;
-	margin-left: 6px;
+	margin-left: 0;
 	margin-right: 0;
 }
 
@@ -191,11 +191,6 @@
 .logview-cbfilter > div > div:last-child {
 	margin-right: 0;
 	margin-left: 0;
-}
-
-.logview-cbfilter.logview-columns > div > div,
-.logview-cbfilter.logview-columns > div > em {
-	margin: 2px 0 2px 4px;
 }
 
 .logview-cbfilter > div > div {
