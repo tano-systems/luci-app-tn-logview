@@ -1,0 +1,30 @@
+#!/bin/sh
+
+FORMAT=${1:-plain}
+
+if [ ! -x /usr/bin/syslog_fc ]; then
+	echo "/usr/bin/syslog_fc not exists"
+	exit 1
+fi
+
+vrrplog_file="/var/log/keepalived.log"
+
+dump_vrrplog() {
+	if [ -f "${vrrplog_file}.1.gz" ]; then
+		zcat "${vrrplog_file}.1.gz"
+	elif [ -f "${vrrplog_file}.1" ]; then
+		cat "${vrrplog_file}.1"
+	fi
+
+	[ -f "${vrrplog_file}" ] && cat "${vrrplog_file}"
+}
+
+case "$FORMAT" in
+	json|csv)
+		dump_vrrplog | /usr/bin/syslog_fc -f ${FORMAT} -s
+		;;
+
+	*)
+		dump_vrrplog
+		;;
+esac

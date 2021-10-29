@@ -1,0 +1,9 @@
+{
+	"luci-app-tn-logview-keepalived" : {
+		"description": "Grant access to view VRRP log",
+		"read": {
+			"file": { "/usr/libexec/luci-logview/logview-keepalived *": [ "exec" ] },
+			"ubus": { "file": [ "exec" ] }
+		}
+	}
+}
